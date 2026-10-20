@@ -69,30 +69,30 @@ export function RegMark({ size = 22, className = '' }: { size?: number; classNam
   );
 }
 
+/** Desenho do monograma AM (módulo: altura 20, haste 4, inclinação 8:20). */
+const AM_BODY = 'M0 20 L8 0 L12 0 L18 15 L24 0 L28 0 L36 20 L32 20 L26 5 L20 20 L16 20 L10 5 L4 20 Z';
+const AM_BAR = 'M7.2 12 L12.8 12 L14 15 L6 15 Z';
+
 /**
- * Logo completa: o símbolo (monograma) + o nome + o descritor.
- * As iniciais saem do nome cadastrado no painel, então a logo
- * se atualiza sozinha quando o nome muda.
+ * Logo completa: o símbolo AM + o nome + o descritor.
+ * O símbolo usa a cor do texto (grafite no tema claro, areia no escuro)
+ * e a travessa sempre em laranja.
  */
 export function Logo({
   name,
-  mono,
   descriptor,
-  size = 34,
+  size = 22,
 }: {
   name: string;
-  mono: string;
+  mono?: string;
   descriptor?: string;
   size?: number;
 }) {
   return (
-    <span className="inline-flex items-center gap-3">
-      <Monogram text={mono} size={size} />
+    <span className="inline-flex items-center" style={{ gap: size * 0.45 }}>
+      <Monogram size={size} />
       <span className="flex flex-col leading-none">
-        <span
-          className="font-bold tracking-tight"
-          style={{ fontVariationSettings: "'wdth' 112", fontSize: size * 0.46 }}
-        >
+        <span className="font-extrabold" style={{ fontSize: 15, letterSpacing: '-0.02em' }}>
           {name}
         </span>
         {descriptor && <span className="slug mt-1 hidden sm:block">{descriptor}</span>}
@@ -101,24 +101,18 @@ export function Logo({
   );
 }
 
-/** Monograma: as iniciais numa folha grafite com o canto em hachura laranja. */
-export function Monogram({ text, size = 40 }: { text: string; size?: number }) {
+/** Símbolo AM. `size` é a altura em px; a largura segue a proporção 9:5. */
+export function Monogram({ size = 22 }: { text?: string; size?: number }) {
   return (
-    <span
+    <svg
       aria-hidden="true"
-      className="relative inline-flex shrink-0 items-center justify-center overflow-hidden bg-ink text-paper"
-      style={{ width: size, height: size }}
+      viewBox="0 0 36 20"
+      width={size * 1.8}
+      height={size}
+      className="shrink-0"
     >
-      <span
-        className="display relative z-10"
-        style={{ fontSize: size * 0.42, letterSpacing: '-0.04em', lineHeight: 1 }}
-      >
-        {text}
-      </span>
-      <span
-        className="absolute -right-1 bottom-0 h-1/2 w-1/2 hatch-accent"
-        style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
-      />
-    </span>
+      <path d={AM_BODY} fill="currentColor" />
+      <path d={AM_BAR} fill="var(--accent)" />
+    </svg>
   );
 }

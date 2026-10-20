@@ -1,43 +1,19 @@
 import { ImageResponse } from 'next/og';
-import { getSettings } from '@/lib/data';
-import { initials } from '@/lib/site';
 
 export const size = { width: 64, height: 64 };
 export const contentType = 'image/png';
-export const revalidate = 3600;
 
-/** Ícone da aba do navegador: o monograma da logo. */
-export default async function Icon() {
-  const settings = await getSettings();
+/** Ícone da aba do navegador: o símbolo AM sobre o quadrado grafite. */
+export default function Icon() {
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#202020',
-          color: '#F3F0E8',
-          fontSize: 30,
-          fontWeight: 800,
-          letterSpacing: -2,
-          position: 'relative',
-        }}
-      >
-        {initials(settings.name)}
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            width: 0,
-            height: 0,
-            borderLeft: '22px solid transparent',
-            borderBottom: '22px solid #E66A3C',
-          }}
-        />
+      <div style={{ width: '100%', height: '100%', display: 'flex', background: '#202020' }}>
+        <svg width="64" height="64" viewBox="0 0 60 60">
+          <g transform="translate(12 20)">
+            <path fill="#F2F0E7" d="M0 20 L8 0 L12 0 L18 15 L24 0 L28 0 L36 20 L32 20 L26 5 L20 20 L16 20 L10 5 L4 20 Z" />
+            <path fill="#E66A3C" d="M7.2 12 L12.8 12 L14 15 L6 15 Z" />
+          </g>
+        </svg>
       </div>
     ),
     size,

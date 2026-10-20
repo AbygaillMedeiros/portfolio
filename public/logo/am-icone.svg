@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="600" height="600">
+  <!-- Ícone: quadrado 60m, símbolo centralizado (margem 12m lateral, 20m vertical) -->
+  <rect width="60" height="60" fill="#202020"/>
+  <g transform="translate(12 20)">
+    <path fill="#F2F0E7" d="M0 20 L8 0 L12 0 L18 15 L24 0 L28 0 L36 20 L32 20 L26 5 L20 20 L16 20 L10 5 L4 20 Z"/>
+    <path fill="#E66A3C" d="M7.2 12 L12.8 12 L14 15 L6 15 Z"/>
+  </g>
+</svg>

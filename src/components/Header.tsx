@@ -33,7 +33,7 @@ export default function Header({
       </a>
       <div className="mx-auto flex h-16 max-w-page items-center justify-between gap-4 px-4 sm:px-8">
         <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <Logo name={name} mono={mono} descriptor={descriptor} size={36} />
+          <Logo name={name} mono={mono} descriptor={descriptor} size={22} />
         </Link>
 
         <nav aria-label="Principal" className="hidden items-center gap-8 md:flex">
