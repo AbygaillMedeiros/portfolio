@@ -57,7 +57,7 @@ function fichaFrase(fr) {
   const v = fr.verbete;
   const status = fr.confirmar
     ? '<span class="tag alerta">significado a confirmar</span>'
-    : '<span class="tag ok">significado conferido</span>';
+    : '';
   return `<div class="topo">
       <h1>${esc(fr.frase)}</h1>
       <div class="meta"><span class="tag">coleção ${esc(col.nome.toLowerCase())}</span>${status}<span class="tag">arquivo: ${esc(fr.id)}</span></div>
