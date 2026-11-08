@@ -8,9 +8,10 @@ Tudo o que precisa para começar: nomes, artes prontas para DTF, mockups, verbet
 
 | Pasta / arquivo | O que é |
 |---|---|
-| `catalogo.html` | Vitrine com as fotos das camisas. Troque preta/off-white, marque as que quer produzir e copie a lista. |
-| `mockups/folhas/` | **8 imagens com 4 camisas cada**, para mostrar, postar ou votar. |
-| `mockups/preta/` e `mockups/offwhite/` | Uma foto por camisa (1200 × 1200 px). |
+| `catalogo.html` | Vitrine com as fotos das camisas. Troque a cor (preta, branca, cinza, azul, vermelha), marque as que quer produzir e copie a lista. |
+| `mockups/folhas/` | **7 imagens com 4 camisas cada**, para mostrar, postar ou votar. |
+| `mockups/<cor>/` | Uma foto por estampa e por cor: modelo de frente e de costas (1448 × 1086 px). |
+| `mockups-base/` | As fotos do modelo com camisa lisa, usadas como base dos mockups. |
 | `artes/png/` | **Arquivos para a gráfica.** PNG 300 dpi, fundo transparente, tamanho real. |
 | `artes/svg/` | Os mesmos arquivos em vetor (Illustrator, Corel, Inkscape, Figma). |
 | `dados/frases.json` | Frases, verbetes, coleções, cores e nome da marca. É aqui que se edita. |
@@ -29,7 +30,9 @@ Cada coleção tem uma letra própria:
 | Elogio | assinatura fina (Water Brush) | elegante, caneta-pincel |
 | Ação e afeto | marcador à mão (Rock Salt) | bilhete escrito com pressa |
 
-Complementos: máquina de escrever (Special Elite), Courier Prime no verbete da nuca e Bebas Neue nas listas das costas.
+Complementos: máquina de escrever (Special Elite), Courier Prime no verbete da nuca e Bebas Neue nas cidades da turnê.
+
+**Uma frase por camisa.** A frente tem a gíria. As costas têm só o verbete da mesma gíria, pequeno, na nuca.
 
 ### O que existe de arte
 
@@ -37,9 +40,7 @@ Complementos: máquina de escrever (Special Elite), Courier Prime no verbete da 
   - `frente/`: frase grande no peito, 26–28 cm.
   - `bolso/`: versão pequena para o peito, até 9 cm.
   - `nuca/`: verbete de dicionário, 9 cm.
-- **3 estampas de costas** (`costas/`):
-  - Dicionário vol. 1 e vol. 2, a lista de gírias no estilo "nomes da banda".
-  - Turnê "Lá na Caixa-prego", com 8 cidades do Amazonas e datas, no estilo camisa de turnê. A frente dela é `frente/turne`.
+- **Camisa de turnê** (`costas/turne` e `frente/turne`): uma frase só, "Lá na Caixa-prego", com 8 cidades do Amazonas e datas nas costas, no estilo camisa de banda.
 - **Marca** (`marca/`):
   - assinatura (manga), logotipo, selo, etiqueta da barra e mensagem do avesso.
 - Tudo em versão `-escura` (para camisa preta ou escura) e `-clara` (para branca, off-white ou areia).
@@ -69,7 +70,7 @@ Pesquise o nome no INPI (busca gratuita em gov.br/inpi, classe 25, vestuário) e
 | Deboche | Telezé?, Olha o papo desse bicho!, Tá só o pitiú, Cheio de pavulagem!, Só o cuí!, Marrapaz! Se manca!, É muito fuleiro mesmo!, Nem com nojo |
 | Elogio | Maceta!, Maceta que só!, Tá lá, cheiroso!, No olho!, De cumborra!!, Capim na palheta! |
 | Ação e afeto | Borimbora, Pega o beco!, Toma tua merenda!, Não trisca, Lá na Caixa-prego, Ê caroço!, Moleque doido! |
-| Costas | Dicionário vol. 1, Dicionário vol. 2, Turnê Lá na Caixa-prego |
+| Turnê | Turnê Lá na Caixa-prego |
 
 **Duplas para presente:** Mano! + Mana!, Olha já! + Espia só!, Toma tua merenda! + Moleque doido!
 
@@ -94,9 +95,9 @@ Corrija em `dados/frases.json` (campos `verbete` e `nota`) ou me mande o signifi
 
 | Lugar | Arquivo | Tamanho | Posição |
 |---|---|---|---|
-| Frente | `png/frente/<frase>-escura.png` | 26–28 cm | Começa a 7 cm da gola |
+| Frente | `png/frente/<frase>-escura.png` | 28 cm (normal) a 32 cm (oversized) | Começa a 7 cm da gola |
 | Peito (pequena) | `png/bolso/` | até 9 cm | Lado esquerdo de quem veste, a 18–20 cm do ombro |
-| Costas | `png/costas/` | 20–26 cm | Começa a 9 cm da gola |
+| Costas (turnê) | `png/costas/` | 26 cm | Começa a 8 cm da gola |
 | Nuca (verbete) | `png/nuca/` | 9 cm | 3 cm abaixo da costura da gola |
 | Manga | `png/marca/assinatura-*.png` | 7–8 cm | Centro da manga, 3 cm acima da barra. Não pode passar da costura do ombro. |
 | Etiqueta da barra | `png/marca/etiqueta-barra-*.png` | 5 × 1 cm | Frente, 4 cm acima da barra, 3 cm da costura lateral |
@@ -106,14 +107,18 @@ Dicas:
 
 - **Peça uma prova antes do lote.** Imprima 2 ou 3 camisas e lave 10 vezes do avesso.
 - **Traço fino:** a letra de assinatura (coleção Elogio) e a máquina de escrever têm partes finas. Pergunte se o equipamento reproduz linha de 0,5 mm. Se não, use a versão de frente em vez da de peito.
-- **Comece com preta e off-white.** As duas mostram as duas versões das artes e simplificam o estoque.
+- **Versão da arte:** `-escura` (tinta clara) para camisa preta, cinza, azul e vermelha; `-clara` (tinta escura) para branca e off-white.
+- **Camisa vermelha:** o traço vermelho some no tecido vermelho. Peça à gráfica para trocar o vermelho por preto (no mockup já está assim).
+- **Comece com 2 cores** (preta e branca, por exemplo) para simplificar o estoque.
 - Etiqueta interna: "Lave do avesso. Não passe ferro sobre a estampa."
 
 ## 4. Mockups
 
-As fotos em `mockups/` são geradas por computador: camisa estendida com dobras, malha, gola canelada, costura e sombra, com a estampa acompanhando o tecido. Não gastam crédito de nenhum site e são refeitas sozinhas quando uma arte muda.
+As fotos em `mockups/` usam as imagens de modelo em `mockups-base/` (preta, branca, cinza, azul e vermelha). A estampa é aplicada seguindo a luz e as dobras de cada foto: frase no peito, verbete na nuca, assinatura na manga e etiqueta na barra. Não gastam crédito de nenhum site e são refeitas sozinhas quando uma arte muda.
 
-Servem para escolher, votar com os amigos e abrir a pré-venda. Para fotos com pessoas vestindo, veja a seção 7.
+Para trocar de modelo, coloque outra foto em `mockups-base/` com o mesmo nome e ajuste as posições `FRENTE`, `COSTAS`, `MANGA` e `ETIQUETA` no começo de `ferramentas/gerar_mockups.py`. Funciona direto com fotos do mesmo enquadramento.
+
+Antes de usar as fotos para vender, confirme que a licença do banco de imagens de onde vieram permite uso comercial.
 
 ## 5. Embalagem
 
@@ -173,7 +178,7 @@ Tudo sai de `dados/frases.json`:
 - **Nome da marca:** troque `"nome": "Pavulagem"`.
 - **Frase:** `script` (letra à mão), `pre` (máquina de escrever antes, em vermelho), `nota` (explicação embaixo), `doodle` (rabisco: estrela, coracao, faiscas, seta, olho, rabisco, cheiro, coroa, x, brilho, alvo, velocidade, migalhas).
 - **Verbete:** `definicao` e `exemplo`. Depois de confirmar, apague `"confirmar": true`.
-- **Listas e turnê:** em `listas` e `turne`.
+- **Turnê:** em `turne`.
 
 Depois, na raiz do projeto:
 
@@ -182,7 +187,7 @@ pip install fonttools uharfbuzz brotli pillow numpy scipy
 python3 marca-camisetas/ferramentas/gerar_artes.py     # SVGs + catalogo.html
 node marca-camisetas/ferramentas/exportar_png.js       # PNGs 300 dpi (precisa do Playwright)
 python3 marca-camisetas/ferramentas/marcar_dpi.py      # grava 300 dpi nos PNGs
-python3 marca-camisetas/ferramentas/gerar_mockups.py   # fotos das camisas + folhas com 4
+python3 marca-camisetas/ferramentas/gerar_mockups.py   # fotos com o modelo + folhas com 4
 ```
 
 Ou me peça a mudança que eu gero tudo de novo.

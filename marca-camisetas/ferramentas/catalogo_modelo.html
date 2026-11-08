@@ -62,9 +62,10 @@ main { padding-block: 22px 44px; }
 .colecao { margin-bottom: 34px; }
 .colecao h2 { font: 400 40px/1 var(--font-marca); margin: 0 0 2px; }
 .colecao > p { margin: 0 0 14px; color: var(--muted); }
-.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
-.card img { display: block; width: 100%; height: auto; aspect-ratio: 1; max-width: 100%; background: var(--line); }
+.card img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; max-width: 100%; background: #1E1E22; }
+.chip .bola { width: 11px; height: 11px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: -1px; border: 1px solid #0003; }
 .info { padding: 12px 14px 14px; display: grid; gap: 8px; min-width: 0; }
 .info h3 { margin: 0; font: 600 18px/1.2 var(--font-ui); text-wrap: balance; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -99,7 +100,7 @@ td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
   <div class="wrap topo">
     <img class="logo claro" src="artes/svg/marca/logo-clara.svg" alt="Pavulagem: veste e se mostra">
     <img class="logo escuro" src="artes/svg/marca/logo-escura.svg" alt="" aria-hidden="true">
-    <p><strong>27 frases do Amazonas e 3 estampas de costas.</strong> Letra à mão com traço vermelho, rabisco e uma linha de máquina de escrever. Todas têm a assinatura na manga e a etiqueta na barra. Troque a cor da camisa, marque as que quer produzir e copie a lista para a gráfica.</p>
+    <p><strong>27 frases do Amazonas, uma por camisa, e a camisa de turnê.</strong> Letra à mão com traço vermelho, rabisco e uma linha de máquina de escrever. Cada foto mostra a frente e as costas: frase no peito, verbete na nuca, assinatura na manga e etiqueta na barra. Troque a cor da camisa, marque as que quer produzir e copie a lista para a gráfica.</p>
     <div class="nota" id="nota-confirmar"></div>
   </div>
 </header>
@@ -124,12 +125,12 @@ td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
     <section class="extra" aria-labelledby="t-medidas">
       <h2 id="t-medidas">Medidas para a gráfica</h2>
-      <p>Mande o PNG da pasta certa. Ele já está no tamanho real, em 300 dpi e com fundo transparente. Versão <b>escura</b> para camisa preta ou colorida escura. Versão <b>clara</b> para branca, off-white e areia.</p>
+      <p>Mande o PNG da pasta certa. Ele já está no tamanho real, em 300 dpi e com fundo transparente. Versão <b>escura</b> (tinta clara) para camisa preta, cinza, azul e vermelha. Versão <b>clara</b> (tinta escura) para branca, off-white e areia. Na camisa vermelha, peça o traço vermelho em preto.</p>
       <div class="tabela">
         <table>
           <thead><tr><th>Lugar</th><th>Pasta</th><th>Tamanho</th><th>Onde fica</th></tr></thead>
           <tbody>
-            <tr><td>Frente</td><td>png/frente</td><td class="n">26–28 cm de largura</td><td>Começa a 7 cm da gola, centralizada.</td></tr>
+            <tr><td>Frente</td><td>png/frente</td><td class="n">28 cm (normal) a 32 cm (oversized)</td><td>Começa a 7 cm da gola, centralizada.</td></tr>
             <tr><td>Peito (versão pequena)</td><td>png/bolso</td><td class="n">até 9 cm</td><td>Lado esquerdo de quem veste, a 18–20 cm do ombro.</td></tr>
             <tr><td>Costas (dicionário e turnê)</td><td>png/costas</td><td class="n">20–26 cm de largura</td><td>Começa a 9 cm da gola. No peito, vai a assinatura.</td></tr>
             <tr><td>Nuca (verbete)</td><td>png/nuca</td><td class="n">9 cm de largura</td><td>Costas, 3 cm abaixo da costura da gola.</td></tr>
@@ -149,23 +150,26 @@ td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
 const D = /*DADOS*/null;
 
 const CAMISAS = [
-  { id: "preta", nome: "Preta", var: "escura", cor: "#1F1F21" },
-  { id: "offwhite", nome: "Off-white", var: "clara", cor: "#E9E5DB" },
+  { id: "preta", nome: "Preta", var: "escura", cor: "#1C1C1E" },
+  { id: "branca", nome: "Branca", var: "clara", cor: "#F2F2F0" },
+  { id: "cinza", nome: "Cinza", var: "escura", cor: "#6A6A6A" },
+  { id: "azul", nome: "Azul", var: "escura", cor: "#2F64AE" },
+  { id: "vermelha", nome: "Vermelha", var: "escura", cor: "#C0161B", nota: "traço vermelho vira preto" },
 ];
 const estado = { colecao: "todas", camisa: "preta", escolhidas: new Set() };
 try {
-  const salvo = JSON.parse(localStorage.getItem("pavulagem-catalogo-v2") || "{}");
+  const salvo = JSON.parse(localStorage.getItem("pavulagem-catalogo-v3") || "{}");
   if (salvo.camisa) estado.camisa = salvo.camisa;
   if (Array.isArray(salvo.escolhidas)) estado.escolhidas = new Set(salvo.escolhidas);
 } catch (e) {}
 function guardar() {
-  try { localStorage.setItem("pavulagem-catalogo-v2", JSON.stringify({ camisa: estado.camisa, escolhidas: [...estado.escolhidas] })); } catch (e) {}
+  try { localStorage.setItem("pavulagem-catalogo-v3", JSON.stringify({ camisa: estado.camisa, escolhidas: [...estado.escolhidas] })); } catch (e) {}
 }
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const aspas = s => s.replace(/"([^"]*)"/g, "“$1”");
 
-const COLECOES = { ...D.colecoes, costas: { nome: "Costas", descricao: "Estampa grande nas costas e assinatura pequena no peito." } };
+const COLECOES = { ...D.colecoes, costas: { nome: "Turnê", descricao: "Uma frase só, no estilo camisa de turnê: assinatura no peito e cidades nas costas." } };
 const ITENS = [
   ...D.frases.map(f => ({ ...f, nome: f.frase })),
   ...D.listas.map(l => ({ id: l.id, nome: l.nome, colecao: "costas", detalhe: l.linhas.join(" · ") })),
@@ -179,7 +183,7 @@ function chips() {
   fc.insertAdjacentHTML("beforeend", op.map(([k, n]) => `<button class="chip" type="button" id="c-${k}" data-colecao="${k}">${esc(n)}</button>`).join(""));
   fc.addEventListener("click", e => { const b = e.target.closest("[data-colecao]"); if (b) { estado.colecao = b.dataset.colecao; desenhar(); } });
   const fm = document.getElementById("f-camisa");
-  fm.insertAdjacentHTML("beforeend", CAMISAS.map(c => `<button class="chip" type="button" id="m-${c.id}" data-camisa="${c.id}">${c.nome}</button>`).join(""));
+  fm.insertAdjacentHTML("beforeend", CAMISAS.map(c => `<button class="chip" type="button" id="m-${c.id}" data-camisa="${c.id}" title="${c.nota || ""}"><i class="bola" style="background:${c.cor}"></i>${c.nome}</button>`).join(""));
   fm.addEventListener("click", e => { const b = e.target.closest("[data-camisa]"); if (b) { estado.camisa = b.dataset.camisa; guardar(); desenhar(); } });
 }
 
@@ -191,7 +195,7 @@ function card(it, cam) {
     ? `<p class="verbete"><b>${esc(it.verbete.palavra)}</b> ${esc(aspas(it.verbete.definicao))}</p>`
     : `<p class="verbete">${esc(it.detalhe)}</p>`;
   return `<article class="card">
-    <img src="mockups/web/${cam.id}/${it.id}.jpg" width="760" height="760" loading="lazy" alt="Camisa ${esc(cam.nome.toLowerCase())} com a estampa ${esc(it.nome)}">
+    <img src="mockups/web/${cam.id}/${it.id}.jpg" width="900" height="675" loading="lazy" alt="Modelo de frente e de costas com camisa ${esc(cam.nome.toLowerCase())} e a estampa ${esc(it.nome)}">
     <div class="info">
       <h3>${esc(it.nome)}</h3>
       <div class="tags">${tags.join("")}</div>

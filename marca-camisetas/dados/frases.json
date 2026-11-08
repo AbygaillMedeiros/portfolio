@@ -437,38 +437,7 @@
    }
   }
  ],
- "listas": [
-  {
-   "id": "lista-vol1",
-   "nome": "Dicionário vol. 1",
-   "linhas": [
-    "MANO",
-    "MANA",
-    "TELEZÉ",
-    "MACETA",
-    "PITIÚ",
-    "PAVULAGEM",
-    "BORIMBORA",
-    "CAIXA-PREGO"
-   ],
-   "rodape": "dicionário manauara · vol. 1"
-  },
-  {
-   "id": "lista-vol2",
-   "nome": "Dicionário vol. 2",
-   "linhas": [
-    "IXI",
-    "EITA PAU",
-    "OLHA JÁ",
-    "NÃO TRISCA",
-    "PEGA O BECO",
-    "FULEIRO",
-    "MARRAPAZ",
-    "SE MANCA"
-   ],
-   "rodape": "dicionário manauara · vol. 2"
-  }
- ],
+ "listas": [],
  "turne": {
   "id": "turne",
   "nome": "Turnê Lá na Caixa-prego",
