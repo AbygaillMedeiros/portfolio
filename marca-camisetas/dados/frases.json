@@ -273,16 +273,15 @@
   {
    "id": "ta-la-cheiroso",
    "frase": "Tá lá, cheiroso!",
-   "colecao": "elogio",
+   "colecao": "deboche",
    "pre": "tá lá,",
    "script": "Cheiroso!",
-   "doodle": "brilho",
-   "confirmar": true,
+   "doodle": "x",
    "verbete": {
-    "palavra": "chei·ro·so",
-    "classe": "adj.",
-    "definicao": "Arrumado, perfumado, pronto pra sair. \"Tá lá\": aí está, prontinho.",
-    "exemplo": "Camisa nova, cabelo feito... tá lá, cheiroso!"
+    "palavra": "tá lá, chei·ro·so",
+    "classe": "expr.",
+    "definicao": "Um não com ironia: pode esquecer, daqui não sai nada.",
+    "exemplo": "— Tu lava a louça hoje no meu lugar? — Tá lá, cheiroso."
    }
   },
   {
@@ -290,30 +289,28 @@
    "frase": "No olho!",
    "colecao": "elogio",
    "script": "No olho!",
-   "nota": "na medida certa",
+   "nota": "resposta certeira",
    "doodle": "alvo",
-   "confirmar": true,
    "verbete": {
     "palavra": "no o·lho",
     "classe": "expr.",
-    "definicao": "Na medida certa, sem errar; acertou em cheio.",
-    "exemplo": "Cortou o bolo sem régua e saiu no olho!"
+    "definicao": "A resposta afiada que acerta em cheio e cala quem tava se achando.",
+    "exemplo": "Ele mandou indireta no grupo, ela devolveu com print. No olho!"
    },
    "fonte": "pincel"
   },
   {
    "id": "de-cumborra",
    "frase": "De cumborra!!",
-   "colecao": "elogio",
+   "colecao": "acao",
    "pre": "de",
    "script": "Cumborra!!",
    "doodle": "faiscas",
-   "confirmar": true,
    "verbete": {
     "palavra": "de cum·bor·ra",
     "classe": "expr.",
-    "definicao": "Em quantidade, de monte, com fartura.",
-    "exemplo": "Na casa da vó tinha tucumã de cumborra!!"
+    "definicao": "Com força total, de uma vez só, arrastando o que estiver na frente.",
+    "exemplo": "O toró veio de cumborra e levou até o tapete da porta."
    }
   },
   {

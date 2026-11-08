@@ -67,35 +67,33 @@ Pesquise o nome no INPI (busca gratuita em gov.br/inpi, classe 25, vestuário) e
 | Coleção | Frases |
 |---|---|
 | Saudação | Mano!, Mana!, Ixi!, Eita pau!, Olha já!, Espia só! |
-| Deboche | Telezé?, Olha o papo desse bicho!, Tá só o pitiú, Cheio de pavulagem!, Só o cuí!, Marrapaz! Se manca!, É muito fuleiro mesmo!, Nem com nojo |
-| Elogio | Maceta!, Maceta que só!, Tá lá, cheiroso!, No olho!, De cumborra!! |
-| Ação e afeto | Borimbora, Pega o beco!, Toma tua merenda!, Não trisca, Lá na Caixa-prego, Ê caroço!, Moleque doido!, Capim na palheta! |
+| Deboche | Telezé?, Olha o papo desse bicho!, Tá só o pitiú, Cheio de pavulagem!, Só o cuí!, Marrapaz! Se manca!, É muito fuleiro mesmo!, Nem com nojo, Tá lá, cheiroso! |
+| Elogio | Maceta!, Maceta que só!, No olho! |
+| Ação e afeto | Borimbora, Pega o beco!, Toma tua merenda!, Não trisca, Lá na Caixa-prego, Ê caroço!, Moleque doido!, Capim na palheta!, De cumborra!! |
 | Turnê | Turnê Lá na Caixa-prego |
 
 **Duplas para presente:** Mano! + Mana!, Olha já! + Espia só!, Toma tua merenda! + Moleque doido!
 
 ### Verbetes conferidos
 
-Conferidos em fontes sobre o falar amazonense (lista abaixo). Os textos dos verbetes foram escritos do zero, sem copiar as fontes.
+Conferidos em dicionários e reportagens sobre o falar amazonense (lista abaixo). Os textos e exemplos dos verbetes foram escritos do zero, sem copiar as fontes.
 
 | Frase | O que mudou |
 |---|---|
-| Capim na palheta! | **Corrigido.** Quer dizer "deu errado" (vem do mato que trava a hélice do barco). Mudou para a coleção Ação e afeto. |
-| Só o cuí! | **Corrigido.** Quer dizer muito magro, só pele e osso. Cuí é a farinha fininha da peneira. |
-| Ê caroço! | **Corrigido.** Grito de susto, ou de alívio de quem escapou por pouco. |
-| Nem com nojo | **Confirmado.** Sem nenhuma vontade de fazer. |
+| Capim na palheta! | **Corrigido.** Deu errado (o mato que trava a hélice do barco). Foi para Ação e afeto. |
+| Só o cuí! | **Corrigido.** Muito magro. Cuí é a farinha fininha da peneira. |
+| Ê caroço! | **Corrigido.** Susto, ou alívio de quem escapou por pouco. |
+| Tá lá, cheiroso! | **Corrigido.** Um "não" irônico, nem vem. Foi para Deboche. |
+| No olho! | **Corrigido.** Resposta certeira, que cala a pessoa. |
+| De cumborra!! | **Corrigido.** Com força total, de uma vez só. Foi para Ação e afeto. |
+| Nem com nojo | **Confirmado.** De jeito nenhum. |
 | Tá só o pitiú | Ajustado: vale para qualquer catinga, não só cheiro de peixe. |
 
-### ⚠️ Ainda falta confirmar 4
-
-Nenhuma fonte encontrada explica estas. Se tu não conheces bem o sentido, o mais seguro é deixar fora da primeira coleção.
+### ⚠️ Ainda falta confirmar 1
 
 | Frase | O que está escrito hoje |
 |---|---|
-| Tá lá, cheiroso! | Arrumado, perfumado, pronto pra sair. |
-| No olho! | Na medida certa, sem errar. |
-| De cumborra!! | Em quantidade, de monte, com fartura. |
-| Toma tua merenda! | Bem feito! Procurou e achou. (Em Manaus, merenda é qualquer refeição, não só o lanche.) |
+| Toma tua merenda! | Bem feito! Procurou e achou. Nenhum dicionário consultado explica a expressão inteira (só "merenda" = lanche, refeição). |
 
 Fontes consultadas:
 - [Portal Amazônia: Amazonês, 30 gírias e expressões de Manaus](https://portalamazonia.com/variedades/amazones-aprenda-30-girias-e-expressoes-que-sao-a-cara-de-manaus-2/)
@@ -104,6 +102,7 @@ Fontes consultadas:
 - [No Amazonas é Assim: expressões do Amazonas](https://noamazonaseassim.com/expressoes-que-so-quem-e-do-amazonas-domina-o-significado/)
 - [Amazonas1: dicionário amazonense](https://amazonas1.com.br/dicionario-amazonense-conheca-o-significado-de-20-expressoes-da-regiao/)
 - [Jornal do Commercio: Esse jeito único de falar](https://jcam.com.br/noticias/esse-jeito-unico-de-falar/)
+- [Dicionário Caboquês de A a Z, de Floriano Arruda](https://franciscogomesdasilva.com.br/olha-ja-dicionario-caboques-de-a-a-z-21/)
 
 Referência mais completa: o livro *Amazonês: expressões e termos usados no Amazonas*, de Sérgio Freire (cerca de 1.100 verbetes).
 
