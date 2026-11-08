@@ -1,0 +1,333 @@
+<title>Catálogo Pavulagem</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Figtree:wght@400;600;700&family=Libre+Baskerville:ital@0;1&display=swap">
+<style>
+/* Layout: faixa da marca, barra de filtros fixa, grade de camisas (1 a 4 colunas), detalhes e medidas */
+:root {
+  --bg: #E9EDE6;          /* névoa de rio */
+  --surface: #F7F8F4;
+  --palco: #DCE2D8;       /* fundo atrás da camisa */
+  --fg: #16201A;
+  --muted: #56645B;
+  --line: #C3CCC0;
+  --mata: #1F5C45;        /* verde mata, acento */
+  --sol: #F2B632;
+  --alerta-bg: #FBE7B5;
+  --alerta-fg: #6B4A00;
+  --font-display: "Alfa Slab One", "Rockwell", Georgia, serif;
+  --font-ui: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --font-verbete: "Libre Baskerville", Georgia, "Times New Roman", serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101612; --surface: #18201B; --palco: #212B24; --fg: #E7ECE5; --muted: #9DAA9F;
+    --line: #2F3B33; --mata: #6CC39B; --sol: #F2B632; --alerta-bg: #3D3214; --alerta-fg: #F6D58A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101612; --surface: #18201B; --palco: #212B24; --fg: #E7ECE5; --muted: #9DAA9F;
+  --line: #2F3B33; --mata: #6CC39B; --sol: #F2B632; --alerta-bg: #3D3214; --alerta-fg: #F6D58A;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--font-ui); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1280px; margin: 0 auto; }
+
+/* topo */
+.topo { padding-block: 28px 18px; display: grid; gap: 14px; }
+.logo { width: min(420px, 100%); height: auto; display: block; }
+.logo.escuro { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo.claro { display: none; } :root:not([data-theme="light"]) .logo.escuro { display: block; } }
+:root[data-theme="dark"] .logo.claro { display: none; }
+:root[data-theme="dark"] .logo.escuro { display: block; }
+.topo p { margin: 0; max-width: 66ch; color: var(--muted); }
+.topo strong { color: var(--fg); }
+.nota { display: inline-flex; gap: 8px; align-items: baseline; background: var(--alerta-bg); color: var(--alerta-fg); padding: 8px 12px; border-radius: 8px; max-width: 72ch; font-size: 14px; }
+
+/* barra de filtros */
+.barra { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); padding-block: 10px; }
+.barra .wrap { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; }
+.grupo { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; }
+.grupo > span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-right: 2px; }
+.chip { font: 600 13px var(--font-ui); border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 5px 11px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.chip i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1px solid #0003; }
+.cor { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--line); cursor: pointer; padding: 0; }
+.cor[aria-pressed="true"] { outline: 2px solid var(--fg); outline-offset: 2px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--mata); outline-offset: 2px; }
+.escolha-total { margin-left: auto; display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.escolha-total b { color: var(--fg); font-variant-numeric: tabular-nums; }
+.btn { font: 600 13px var(--font-ui); background: var(--mata); color: var(--surface); border: 0; border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+.btn:disabled { opacity: .45; cursor: default; }
+
+/* grade */
+main { padding-block: 22px 40px; }
+.colecao { margin-block: 8px 30px; }
+.colecao h2 { font: 400 26px/1.1 var(--font-display); margin: 0 0 4px; display: flex; gap: 10px; align-items: center; }
+.colecao h2 i { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--fg); display: inline-block; }
+.colecao > p { margin: 0 0 14px; color: var(--muted); }
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.palco { background: var(--palco); padding: 10px 6px 4px; }
+.palco svg { display: block; width: 100%; height: auto; }
+.info { padding: 12px 14px 14px; display: grid; gap: 8px; min-width: 0; }
+.info h3 { margin: 0; font: 400 20px/1.15 var(--font-display); text-wrap: balance; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--palco); color: var(--fg); }
+.tag.alerta { background: var(--alerta-bg); color: var(--alerta-fg); }
+.verbete { font: 14px/1.5 var(--font-verbete); margin: 0; }
+.verbete b { font-size: 16px; }
+.verbete em { color: var(--muted); }
+.quero { display: flex; gap: 8px; align-items: center; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 2px; }
+.quero input { width: 18px; height: 18px; accent-color: var(--mata); }
+.vazio { padding: 30px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--r); }
+
+/* detalhes */
+section.extra { margin-top: 44px; }
+section.extra h2 { font: 400 26px/1.1 var(--font-display); margin: 0 0 6px; }
+section.extra > p { margin: 0 0 14px; color: var(--muted); max-width: 70ch; }
+.pecas { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.peca { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.peca .amostra { aspect-ratio: 4 / 3; display: grid; place-items: center; padding: 14px; max-width: 100%; }
+.peca .amostra img { max-height: 100%; width: auto; max-width: 100%; }
+.peca div:last-child { padding: 8px 12px 10px; font-size: 13px; }
+.peca b { display: block; font-size: 14px; }
+.tabela { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+@media (max-width: 560px) { .barra { position: static; } .escolha-total { margin-left: 0; } .info h3 { font-size: 18px; } }
+@media (prefers-reduced-motion: no-preference) { .card { transition: transform .15s; } .card:hover { transform: translateY(-2px); } }
+</style>
+
+<header class="gutter">
+  <div class="wrap topo">
+    <img class="logo claro" src="artes/svg/marca/logo-clara.svg" alt="Pavulagem: Veste e se mostra.">
+    <img class="logo escuro" src="artes/svg/marca/logo-escura.svg" alt="" aria-hidden="true">
+    <p><strong>27 frases do Amazonas em 4 coleções.</strong> Cada camisa tem a frase grande, uma versão pequena para o peito, o verbete de dicionário na nuca e um ícone na manga. Escolha a cor da camisa e a vista (frente, peito ou costas) para ver como fica. Marque as que tu queres produzir e copie a lista.</p>
+    <div class="nota" id="nota-confirmar"></div>
+  </div>
+</header>
+
+<nav class="barra gutter" aria-label="Filtros">
+  <div class="wrap">
+    <div class="grupo" id="f-colecao"><span>Coleção</span></div>
+    <div class="grupo" id="f-vista"><span>Vista</span></div>
+    <div class="grupo" id="f-camisa"><span>Camisa</span></div>
+    <div class="escolha-total"><span><b id="n-escolhidas">0</b> escolhidas</span><button class="btn" id="copiar" type="button">Copiar lista</button></div>
+  </div>
+</nav>
+
+<main class="gutter">
+  <div class="wrap">
+    <div id="lista"></div>
+
+    <section class="extra" aria-labelledby="t-marca">
+      <h2 id="t-marca">Detalhes da marca</h2>
+      <p>Peças que se repetem em todas as camisas. O selo e a etiqueta vão na barra lateral, perto da costura sem passar por cima dela. A mensagem do avesso é impressa por dentro, na barra das costas.</p>
+      <div class="pecas" id="pecas-marca"></div>
+    </section>
+
+    <section class="extra" aria-labelledby="t-manga">
+      <h2 id="t-manga">Ícones de manga</h2>
+      <p>Um ícone fixo por coleção vira assinatura. Os outros servem para edições especiais.</p>
+      <div class="pecas" id="pecas-manga"></div>
+    </section>
+
+    <section class="extra" aria-labelledby="t-medidas">
+      <h2 id="t-medidas">Medidas para a gráfica</h2>
+      <p>Mande o PNG da pasta certa. Ele já está no tamanho real, em 300 dpi e com fundo transparente. Use a versão <b>clara</b> em camisa branca, off-white e areia. Use a versão <b>escura</b> em preta, verde-musgo, açaí e marinho.</p>
+      <div class="tabela">
+        <table>
+          <thead><tr><th>Lugar</th><th>Pasta</th><th>Tamanho</th><th>Onde fica</th></tr></thead>
+          <tbody>
+            <tr><td>Frente ou costas</td><td>png/frente</td><td class="n">28 cm de largura (até 30 cm de altura)</td><td>Começa a 7–9 cm da gola. Nas costas, pode imprimir o mesmo arquivo até 30 cm.</td></tr>
+            <tr><td>Peito ou bolso</td><td>png/bolso</td><td class="n">até 9 × 8 cm</td><td>Lado esquerdo de quem veste, a 18–20 cm do ombro.</td></tr>
+            <tr><td>Nuca (verbete)</td><td>png/nuca</td><td class="n">9 cm de largura</td><td>Costas, 3 cm abaixo da costura da gola.</td></tr>
+            <tr><td>Manga</td><td>png/manga</td><td class="n">7 × 7 cm</td><td>Centro da manga, 3 cm acima da barra. Não passa da costura do ombro.</td></tr>
+            <tr><td>Selo</td><td>png/marca/selo</td><td class="n">6 cm</td><td>Manga ou barra lateral.</td></tr>
+            <tr><td>Etiqueta da barra</td><td>png/marca/etiqueta-barra</td><td class="n">cerca de 6 × 1 cm</td><td>Frente, 4 cm acima da barra, 3 cm da costura lateral.</td></tr>
+            <tr><td>Mensagem do avesso</td><td>png/marca/avesso</td><td class="n">8 cm de largura</td><td>Por dentro, nas costas, perto da barra.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const D = /*DADOS*/null;
+
+const CAMISAS = [
+  { id: "branca", nome: "Branca", cor: "#F8F7F3", escura: false },
+  { id: "offwhite", nome: "Off-white", cor: "#ECE3CF", escura: false },
+  { id: "areia", nome: "Areia", cor: "#CFB98F", escura: false },
+  { id: "preta", nome: "Preta", cor: "#1E1E1E", escura: true },
+  { id: "musgo", nome: "Verde-musgo", cor: "#384733", escura: true },
+  { id: "acai", nome: "Açaí", cor: "#43202F", escura: true },
+  { id: "marinho", nome: "Azul-marinho", cor: "#1E2A44", escura: true },
+];
+const VISTAS = [["frente", "Frente"], ["peito", "Peito"], ["costas", "Costas"]];
+const ICONE_COLECAO = { saudacao: "guarana", deboche: "boto", elogio: "teatro-amazonas", acao: "tucunare" };
+const NOMES_ICONES = { "guarana": "Guaraná", "boto": "Boto", "teatro-amazonas": "Teatro Amazonas", "tucunare": "Tucunaré", "vitoria-regia": "Vitória-régia", "encontro-das-aguas": "Encontro das Águas" };
+
+const estado = { colecao: "todas", vista: "frente", camisa: "offwhite", escolhidas: new Set() };
+try {
+  const salvo = JSON.parse(localStorage.getItem("pavulagem-catalogo") || "{}");
+  if (salvo.vista) estado.vista = salvo.vista;
+  if (salvo.camisa) estado.camisa = salvo.camisa;
+  if (Array.isArray(salvo.escolhidas)) estado.escolhidas = new Set(salvo.escolhidas);
+} catch (e) {}
+function guardar() {
+  try { localStorage.setItem("pavulagem-catalogo", JSON.stringify({ vista: estado.vista, camisa: estado.camisa, escolhidas: [...estado.escolhidas] })); } catch (e) {}
+}
+
+const porId = Object.fromEntries(D.frases.map(f => [f.id, f]));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const aspas = s => s.replace(/"([^"]*)"/g, "“$1”");
+
+// Camisa desenhada em escala: 6,54 unidades = 1 cm (peito de 52 cm = 340 unidades)
+const CM = 6.54;
+const FRENTE = "M236 38 C260 80 340 80 364 38 L455 62 L566 160 L512 222 L470 190 L470 610 Q300 622 130 610 L130 190 L88 222 L34 160 L145 62 Z";
+const COSTAS = "M236 38 C262 54 338 54 364 38 L455 62 L566 160 L512 222 L470 190 L470 610 Q300 622 130 610 L130 190 L88 222 L34 160 L145 62 Z";
+
+function img(href, x, y, w, h) {
+  return `<image href="${href}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMin meet"/>`;
+}
+function camisa(f, vista, cam) {
+  const v = cam.escura ? "escura" : "clara";
+  const costas = vista === "costas";
+  const tom = cam.escura ? "#ffffff22" : "#00000026";
+  const arteW = 28 * CM, arteH = 30 * CM;
+  let artes = "";
+  if (vista === "frente") {
+    artes += img(`artes/svg/frente/${f.id}-${v}.svg`, 300 - arteW / 2, 128, arteW, arteH);
+    artes += img(`artes/svg/marca/etiqueta-barra-${v}.svg`, 150, 578, 6 * CM, 1.2 * CM);
+  } else if (vista === "peito") {
+    artes += img(`artes/svg/bolso/${f.id}-${v}.svg`, 382 - 4.5 * CM, 132, 9 * CM, 8 * CM);
+  } else {
+    artes += img(`artes/svg/nuca/${f.id}-${v}.svg`, 300 - 4.5 * CM, 66, 9 * CM, 6 * CM);
+    artes += img(`artes/svg/frente/${f.id}-${v}.svg`, 300 - arteW / 2, 128, arteW, arteH);
+  }
+  const icone = ICONE_COLECAO[f.colecao];
+  const manga = costas ? "" : `<g transform="rotate(42 506 150)">${img(`artes/svg/manga/${icone}-${v}.svg`, 506 - 3 * CM, 150 - 3 * CM, 6 * CM, 6 * CM)}</g>`;
+  const gola = costas ? "M236 38 C262 54 338 54 364 38" : "M236 38 C260 80 340 80 364 38";
+  return `<svg viewBox="20 20 560 610" role="img" aria-label="${esc(f.frase)} em camisa ${esc(cam.nome.toLowerCase())}, vista ${vista}">
+    <path d="${costas ? COSTAS : FRENTE}" fill="${cam.cor}" stroke="${tom}" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${gola}" fill="none" stroke="${tom}" stroke-width="9" stroke-linecap="round"/>
+    <path d="M145 62 L130 190 M455 62 L470 190" fill="none" stroke="${tom}" stroke-width="1.5"/>
+    ${artes}${manga}
+  </svg>`;
+}
+
+function chips() {
+  const fc = document.getElementById("f-colecao");
+  const opcoes = [["todas", "Todas", null], ...Object.entries(D.colecoes).map(([k, c]) => [k, c.nome, c.preenchimento]), ["escolhidas", "Escolhidas", null]];
+  fc.insertAdjacentHTML("beforeend", opcoes.map(([k, n, cor]) =>
+    `<button class="chip" type="button" id="c-${k}" data-colecao="${k}" aria-pressed="${estado.colecao === k}">${cor ? `<i style="background:${cor}"></i>` : ""}${n}</button>`).join(""));
+  fc.addEventListener("click", e => { const b = e.target.closest("[data-colecao]"); if (!b) return; estado.colecao = b.dataset.colecao; desenhar(); });
+
+  const fv = document.getElementById("f-vista");
+  fv.insertAdjacentHTML("beforeend", VISTAS.map(([k, n]) => `<button class="chip" type="button" id="v-${k}" data-vista="${k}">${n}</button>`).join(""));
+  fv.addEventListener("click", e => { const b = e.target.closest("[data-vista]"); if (!b) return; estado.vista = b.dataset.vista; guardar(); desenhar(); });
+
+  const fm = document.getElementById("f-camisa");
+  fm.insertAdjacentHTML("beforeend", CAMISAS.map(c => `<button class="cor" type="button" id="m-${c.id}" data-camisa="${c.id}" title="${c.nome}" aria-label="Camisa ${c.nome}" style="background:${c.cor}"></button>`).join(""));
+  fm.addEventListener("click", e => { const b = e.target.closest("[data-camisa]"); if (!b) return; estado.camisa = b.dataset.camisa; guardar(); desenhar(); });
+}
+
+function card(f, cam) {
+  const col = D.colecoes[f.colecao];
+  const v = f.verbete;
+  const tags = [`<span class="tag" style="background:${col.preenchimento};color:#1B1A17">${esc(col.nome)}</span>`];
+  if (f.dupla) tags.push(`<span class="tag">Dupla com ${esc(porId[f.dupla].frase)}</span>`);
+  if (f.confirmar) tags.push(`<span class="tag alerta">Confirmar significado</span>`);
+  return `<article class="card">
+    <div class="palco">${camisa(f, estado.vista, cam)}</div>
+    <div class="info">
+      <h3>${esc(f.frase)}</h3>
+      <div class="tags">${tags.join("")}</div>
+      <p class="verbete"><b>${esc(v.palavra)}</b> <em>${esc(v.classe)}</em> ${esc(aspas(v.definicao))} <em>“${esc(v.exemplo)}”</em></p>
+      <label class="quero"><input type="checkbox" id="q-${f.id}" data-quero="${f.id}" ${estado.escolhidas.has(f.id) ? "checked" : ""}> Quero produzir</label>
+    </div>
+  </article>`;
+}
+
+function desenhar() {
+  const cam = CAMISAS.find(c => c.id === estado.camisa) || CAMISAS[1];
+  document.querySelectorAll("[data-colecao]").forEach(b => b.setAttribute("aria-pressed", b.dataset.colecao === estado.colecao));
+  document.querySelectorAll("[data-vista]").forEach(b => b.setAttribute("aria-pressed", b.dataset.vista === estado.vista));
+  document.querySelectorAll("[data-camisa]").forEach(b => b.setAttribute("aria-pressed", b.dataset.camisa === estado.camisa));
+
+  const lista = document.getElementById("lista");
+  let html = "";
+  for (const [k, col] of Object.entries(D.colecoes)) {
+    if (estado.colecao !== "todas" && estado.colecao !== "escolhidas" && estado.colecao !== k) continue;
+    const fs = D.frases.filter(f => f.colecao === k && (estado.colecao !== "escolhidas" || estado.escolhidas.has(f.id)));
+    if (!fs.length) continue;
+    html += `<section class="colecao"><h2><i style="background:${col.preenchimento}"></i>${esc(col.nome)}</h2><p>${esc(col.descricao)} ${fs.length} ${fs.length > 1 ? "frases" : "frase"}.</p>
+      <div class="grade">${fs.map(f => card(f, cam)).join("")}</div></section>`;
+  }
+  lista.innerHTML = html || `<div class="vazio">Nenhuma camisa escolhida ainda. Marque "Quero produzir" nas que tu gostar.</div>`;
+  contar();
+  pecas(cam);
+}
+
+function pecas(cam) {
+  const v = cam.escura ? "escura" : "clara";
+  const fundo = `background:${cam.cor}`;
+  const marca = [
+    ["logo", "Logotipo", "Etiqueta, embalagem e redes"],
+    ["selo", "Selo Feito no Amazonas", "Manga ou barra, 6 cm"],
+    ["etiqueta-barra", "Etiqueta da barra", "Frente, perto da barra"],
+    ["avesso", "Mensagem do avesso", "Por dentro, nas costas"],
+  ];
+  document.getElementById("pecas-marca").innerHTML = marca.map(([a, n, d]) =>
+    `<div class="peca"><div class="amostra" style="${fundo}"><img src="artes/svg/marca/${a}-${v}.svg" alt="${esc(n)}"></div><div><b>${esc(n)}</b>${esc(d)}</div></div>`).join("");
+  const usados = Object.fromEntries(Object.entries(ICONE_COLECAO).map(([c, i]) => [i, D.colecoes[c].nome]));
+  document.getElementById("pecas-manga").innerHTML = Object.entries(NOMES_ICONES).map(([a, n]) =>
+    `<div class="peca"><div class="amostra" style="${fundo}"><img src="artes/svg/manga/${a}-${v}.svg" alt="${esc(n)}"></div><div><b>${esc(n)}</b>${usados[a] ? `Coleção ${esc(usados[a])}` : "Edição especial"}</div></div>`).join("");
+}
+
+function contar() {
+  document.getElementById("n-escolhidas").textContent = estado.escolhidas.size;
+  document.getElementById("copiar").disabled = estado.escolhidas.size === 0;
+}
+
+document.getElementById("lista").addEventListener("change", e => {
+  const id = e.target.dataset && e.target.dataset.quero;
+  if (!id) return;
+  e.target.checked ? estado.escolhidas.add(id) : estado.escolhidas.delete(id);
+  guardar(); contar();
+});
+
+function aviso(t) {
+  const el = document.getElementById("toast");
+  el.textContent = t; el.hidden = false;
+  clearTimeout(aviso.t); aviso.t = setTimeout(() => { el.hidden = true; }, 2200);
+}
+document.getElementById("copiar").addEventListener("click", () => {
+  const cam = CAMISAS.find(c => c.id === estado.camisa);
+  const nomes = D.frases.filter(f => estado.escolhidas.has(f.id)).map(f => `- ${f.frase} (${f.id})`);
+  const texto = `${D.marca.nome}: camisas escolhidas (${nomes.length})\n${nomes.join("\n")}\nCor de camisa de referência: ${cam.nome} (arquivos versão ${cam.escura ? "escura" : "clara"})`;
+  navigator.clipboard.writeText(texto).then(() => aviso("Lista copiada"), () => aviso("Não deu para copiar. Selecione o texto da lista manualmente."));
+});
+
+const aConfirmar = D.frases.filter(f => f.confirmar).map(f => f.frase);
+document.getElementById("nota-confirmar").innerHTML =
+  `<span><b>Antes de imprimir:</b> confirme o significado de ${aConfirmar.length} verbetes (marcados em amarelo): ${aConfirmar.map(esc).join(", ")}. Tu conheces as gírias melhor que eu. É só corrigir o texto e gerar de novo. Nome da marca ainda provisório.</span>`;
+
+chips();
+desenhar();
+</script>

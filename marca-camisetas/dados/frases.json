@@ -1,0 +1,221 @@
+{
+  "marca": {
+    "nome": "PAVULAGEM",
+    "cidade": "Manaus · AM",
+    "slogan": "Veste e se mostra.",
+    "selo": "FEITO NO AMAZONAS",
+    "avesso": ["Ei, mano! Tu tá lendo", "o avesso da camisa?", "Telezé?"]
+  },
+
+  "cores": {
+    "escuro": "#1B1A17",
+    "creme": "#FFF6DF"
+  },
+
+  "colecoes": {
+    "saudacao": {
+      "nome": "Saudação",
+      "descricao": "O jeito manauara de chegar, chamar e se espantar.",
+      "fonte": "chango",
+      "preenchimento": "#F2B632",
+      "sombra": "#1F5C45",
+      "filete_clara": "#FFF6DF",
+      "filete_escura": "#1F5C45"
+    },
+    "deboche": {
+      "nome": "Deboche",
+      "descricao": "Pra zoar os amigos com carinho (ou nem tanto).",
+      "fonte": "slab",
+      "preenchimento": "#F28BA8",
+      "sombra": "#5A2149",
+      "filete_clara": "#FFF6DF",
+      "filete_escura": "#5A2149"
+    },
+    "elogio": {
+      "nome": "Elogio",
+      "descricao": "Quando a coisa é grande, boa e bem-feita.",
+      "fonte": "ultra",
+      "preenchimento": "#E0442F",
+      "sombra": "#F2B632",
+      "filete_clara": "#FFF6DF",
+      "filete_escura": "#1B1A17"
+    },
+    "acao": {
+      "nome": "Ação e afeto",
+      "descricao": "Bora, some, não mexe e toma: o dia a dia em quatro verbos.",
+      "fonte": "bungee",
+      "preenchimento": "#4FA3C7",
+      "sombra": "#C7843E",
+      "filete_clara": "#FFF6DF",
+      "filete_escura": "#C7843E"
+    }
+  },
+
+  "frases": [
+    {
+      "id": "mano", "frase": "Mano!", "colecao": "saudacao", "dupla": "mana",
+      "linhas": [{"t": "MANO!", "w": 1}, {"orn": "onda", "w": 0.55}],
+      "bolso": ["MANO!"],
+      "verbete": {"palavra": "ma·no", "classe": "s.m.", "definicao": "Serve pra tudo em Manaus: amigo, irmão, espanto, vírgula.", "exemplo": "Mano, mano... tu não sabe o que aconteceu, mano."}
+    },
+    {
+      "id": "mana", "frase": "Mana!", "colecao": "saudacao", "dupla": "mano",
+      "linhas": [{"t": "MANA!", "w": 1}, {"orn": "onda", "w": 0.55}],
+      "bolso": ["MANA!"],
+      "verbete": {"palavra": "ma·na", "classe": "s.f.", "definicao": "Amiga, irmã, parceira. Chamado de carinho e abertura de fofoca.", "exemplo": "Mana, senta aqui que eu vou te contar."}
+    },
+    {
+      "id": "ixi", "frase": "Ixi!", "colecao": "saudacao",
+      "linhas": [{"t": "IXI!", "w": 0.8}, {"orn": "losangos", "w": 0.4}],
+      "bolso": ["IXI!"],
+      "verbete": {"palavra": "i·xi", "classe": "interj.", "definicao": "Surpresa com uma pitada de preocupação: lá vem problema.", "exemplo": "Ixi, a energia caiu de novo."}
+    },
+    {
+      "id": "eita-pau", "frase": "Eita pau!", "colecao": "saudacao",
+      "linhas": [{"t": "Eita", "f": "script", "w": 0.55}, {"t": "PAU!", "w": 0.8}],
+      "bolso": ["EITA", "PAU!"],
+      "verbete": {"palavra": "ei·ta pau", "classe": "interj.", "definicao": "Espanto dos grandes, pro bem ou pro mal.", "exemplo": "Eita pau, olha o tamanho dessa chuva!"}
+    },
+    {
+      "id": "olha-ja", "frase": "Olha já!", "colecao": "saudacao", "dupla": "espia-so",
+      "linhas": [{"t": "Olha", "f": "script", "w": 0.62}, {"t": "JÁ!", "w": 0.62}],
+      "bolso": ["OLHA", "JÁ!"],
+      "verbete": {"palavra": "o·lha já", "classe": "interj.", "definicao": "Espanto ou indignação. O mesmo que \"olha só isso!\".", "exemplo": "Olha já, furou a fila na cara dura!"}
+    },
+    {
+      "id": "espia-so", "frase": "Espia só!", "colecao": "saudacao", "dupla": "olha-ja",
+      "linhas": [{"t": "Espia", "f": "script", "w": 0.72}, {"t": "SÓ!", "w": 0.55}],
+      "bolso": ["ESPIA", "SÓ!"],
+      "verbete": {"palavra": "es·pi·ar", "classe": "v.", "definicao": "Olhar, dar uma olhada. \"Espia só\": repara nisso aqui.", "exemplo": "Espia só quem resolveu aparecer!"}
+    },
+
+    {
+      "id": "teleze", "frase": "Telezé?", "colecao": "deboche",
+      "linhas": [{"t": "TELEZÉ?", "w": 1}, {"legenda": "tu é leso, é?", "w": 0.42}],
+      "bolso": ["TELEZÉ?"],
+      "verbete": {"palavra": "te·le·zé", "classe": "interj.", "definicao": "Contração de \"tu é leso, é?\". Pergunta pra quem fez leseira.", "exemplo": "Saiu sem guarda-chuva em pleno inverno? Telezé?"}
+    },
+    {
+      "id": "olha-o-papo", "frase": "Olha o papo desse bicho!", "colecao": "deboche",
+      "linhas": [{"t": "Olha o papo", "f": "script", "w": 0.8}, {"t": "DESSE", "w": 0.52}, {"t": "BICHO!", "w": 1}],
+      "bolso": ["OLHA O", "PAPO!"],
+      "verbete": {"palavra": "o·lha o pa·po", "classe": "expr.", "definicao": "Reação a algo absurdo que alguém acabou de dizer.", "exemplo": "Disse que acorda às cinco pra malhar. Olha o papo desse bicho!"}
+    },
+    {
+      "id": "pitiu", "frase": "Tá só o pitiú", "colecao": "deboche",
+      "linhas": [{"t": "Tá só o", "f": "script", "w": 0.55}, {"t": "PITIÚ", "w": 1}, {"orn": "onda", "w": 0.5}],
+      "bolso": ["PITIÚ"],
+      "verbete": {"palavra": "pi·ti·ú", "classe": "s.m.", "definicao": "Cheiro forte de peixe, de rio ou de gente que suou o dia todo.", "exemplo": "Voltou da feira da Panair e tá só o pitiú."}
+    },
+    {
+      "id": "pavulagem", "frase": "Cheio de pavulagem!", "colecao": "deboche",
+      "linhas": [{"t": "Cheio de", "f": "script", "w": 0.55}, {"t": "PAVULAGEM!", "w": 1}, {"orn": "estrelas", "w": 0.5}],
+      "bolso": ["PAVU-", "LAGEM!"],
+      "verbete": {"palavra": "pa·vu·la·gem", "classe": "s.f.", "definicao": "Exibição, marra; mostrar-se mais do que é.", "exemplo": "Comprou tênis novo e já tá cheio de pavulagem."}
+    },
+    {
+      "id": "so-o-cui", "frase": "Só o cuí!", "colecao": "deboche", "confirmar": true,
+      "linhas": [{"t": "Só o", "f": "script", "w": 0.45}, {"t": "CUÍ!", "w": 0.75}],
+      "bolso": ["SÓ O", "CUÍ!"],
+      "verbete": {"palavra": "cu·í", "classe": "s.m.", "definicao": "Farinha fininha, o pó que sobra. \"Tá só o cuí\": acabado, em pedaços.", "exemplo": "Depois do plantão de doze horas eu tô só o cuí."}
+    },
+    {
+      "id": "marrapaz", "frase": "Marrapaz! Se manca!", "colecao": "deboche",
+      "linhas": [{"t": "Marrapaz!", "f": "script", "w": 0.75}, {"t": "SE MANCA!", "w": 1}],
+      "bolso": ["SE", "MANCA!"],
+      "verbete": {"palavra": "mar·ra·paz", "classe": "interj.", "definicao": "\"Mas, rapaz!\": o espanto que vem antes da bronca.", "exemplo": "Marrapaz, pegou meu carregador e sumiu? Se manca!"}
+    },
+    {
+      "id": "fuleiro", "frase": "É muito fuleiro mesmo!", "colecao": "deboche",
+      "linhas": [{"t": "É muito", "f": "script", "w": 0.5}, {"t": "FULEIRO", "w": 1}, {"t": "mesmo!", "f": "script", "w": 0.48}],
+      "bolso": ["FULEIRO!"],
+      "verbete": {"palavra": "fu·lei·ro", "classe": "adj.", "definicao": "De má qualidade; pessoa sem palavra, que promete e não cumpre.", "exemplo": "Marcou às oito e chegou às dez. É muito fuleiro mesmo!"}
+    },
+    {
+      "id": "nem-com-nojo", "frase": "Nem com nojo", "colecao": "deboche", "confirmar": true,
+      "linhas": [{"t": "Nem com", "f": "script", "w": 0.62}, {"t": "NOJO", "w": 0.85}],
+      "bolso": ["NEM COM", "NOJO"],
+      "verbete": {"palavra": "nem com no·jo", "classe": "expr.", "definicao": "De jeito nenhum, nem pensar.", "exemplo": "Banho de igarapé gelado às seis da manhã? Nem com nojo."}
+    },
+
+    {
+      "id": "maceta", "frase": "Maceta!", "colecao": "elogio",
+      "linhas": [{"t": "MACETA!", "w": 1}, {"orn": "losangos", "w": 0.4}],
+      "bolso": ["MACETA!"],
+      "verbete": {"palavra": "ma·ce·ta", "classe": "adj.", "definicao": "Grande, enorme; muito bom.", "exemplo": "Pegou um tambaqui maceta no fim de semana."}
+    },
+    {
+      "id": "maceta-que-so", "frase": "Maceta que só!", "colecao": "elogio",
+      "linhas": [{"t": "MACETA", "w": 1}, {"t": "que só!", "f": "script", "w": 0.6}],
+      "bolso": ["MACETA", "QUE SÓ!"],
+      "verbete": {"palavra": "ma·ce·ta que só", "classe": "expr.", "definicao": "Grande demais, bom demais, no último grau.", "exemplo": "O açaí de lá é maceta que só."}
+    },
+    {
+      "id": "ta-la-cheiroso", "frase": "Tá lá, cheiroso!", "colecao": "elogio", "confirmar": true,
+      "linhas": [{"t": "Tá lá,", "f": "script", "w": 0.42}, {"t": "CHEIROSO!", "w": 1}, {"orn": "estrelas", "w": 0.5}],
+      "bolso": ["TÁ LÁ,", "CHEIROSO!"],
+      "verbete": {"palavra": "chei·ro·so", "classe": "adj.", "definicao": "Arrumado, perfumado, pronto pra sair. \"Tá lá\": aí está, prontinho.", "exemplo": "Camisa nova, cabelo feito... tá lá, cheiroso!"}
+    },
+    {
+      "id": "no-olho", "frase": "No olho!", "colecao": "elogio", "confirmar": true,
+      "linhas": [{"t": "NO", "w": 0.36}, {"t": "OLHO!", "w": 0.88}],
+      "bolso": ["NO", "OLHO!"],
+      "verbete": {"palavra": "no o·lho", "classe": "expr.", "definicao": "Na medida certa, sem errar; acertou em cheio.", "exemplo": "Cortou o bolo sem régua e saiu no olho!"}
+    },
+    {
+      "id": "de-cumborra", "frase": "De cumborra!!", "colecao": "elogio", "confirmar": true,
+      "linhas": [{"t": "De", "f": "script", "w": 0.24}, {"t": "CUMBORRA!!", "w": 1}],
+      "bolso": ["DE", "CUMBORRA!!"],
+      "verbete": {"palavra": "de cum·bor·ra", "classe": "expr.", "definicao": "Em quantidade, de monte, com fartura.", "exemplo": "Na casa da vó tinha tucumã de cumborra!!"}
+    },
+    {
+      "id": "capim-na-palheta", "frase": "Capim na palheta!", "colecao": "elogio", "confirmar": true,
+      "linhas": [{"t": "Capim na", "f": "script", "w": 0.6}, {"t": "PALHETA!", "w": 1}],
+      "bolso": ["CAPIM NA", "PALHETA!"],
+      "verbete": {"palavra": "ca·pim na pa·lhe·ta", "classe": "expr.", "definicao": "A toda velocidade, sem parar pra nada.", "exemplo": "Quando o chefe chegou, foi capim na palheta!"}
+    },
+
+    {
+      "id": "borimbora", "frase": "Borimbora", "colecao": "acao",
+      "linhas": [{"t": "BORIMBORA", "w": 1}, {"orn": "onda", "w": 0.6}],
+      "bolso": ["BORIM-", "BORA"],
+      "verbete": {"palavra": "bo·rim·bo·ra", "classe": "interj.", "definicao": "Vamos embora! Convite que não aceita demora.", "exemplo": "Borimbora que o barco sai às seis."}
+    },
+    {
+      "id": "pega-o-beco", "frase": "Pega o beco!", "colecao": "acao",
+      "linhas": [{"t": "Pega o", "f": "script", "w": 0.55}, {"t": "BECO!", "w": 0.9}],
+      "bolso": ["PEGA O", "BECO!"],
+      "verbete": {"palavra": "pe·ga o be·co", "classe": "expr.", "definicao": "Vai embora, sai daqui, some.", "exemplo": "Chegou pra arengar? Pega o beco!"}
+    },
+    {
+      "id": "toma-tua-merenda", "frase": "Toma tua merenda!", "colecao": "acao", "confirmar": true, "dupla": "moleque-doido",
+      "linhas": [{"t": "Toma tua", "f": "script", "w": 0.6}, {"t": "MERENDA!", "w": 1}],
+      "bolso": ["TOMA TUA", "MERENDA!"],
+      "verbete": {"palavra": "to·ma tu·a me·ren·da", "classe": "expr.", "definicao": "Bem feito! Procurou e achou.", "exemplo": "Mexeu no vespeiro e levou ferroada? Toma tua merenda!"}
+    },
+    {
+      "id": "nao-trisca", "frase": "Não trisca", "colecao": "acao",
+      "linhas": [{"t": "NÃO", "w": 0.5}, {"t": "TRISCA", "w": 1}],
+      "bolso": ["NÃO", "TRISCA"],
+      "verbete": {"palavra": "tris·car", "classe": "v.", "definicao": "Tocar de leve, encostar. \"Não trisca\": não mexe, nem encosta.", "exemplo": "É o último pedaço de bolo. Não trisca!"}
+    },
+    {
+      "id": "caixa-prego", "frase": "Lá na Caixa-prego", "colecao": "acao",
+      "linhas": [{"t": "Lá na", "f": "script", "w": 0.4}, {"t": "CAIXA-", "w": 0.78}, {"t": "PREGO", "w": 0.78}],
+      "bolso": ["CAIXA-", "PREGO"],
+      "verbete": {"palavra": "cai·xa-pre·go", "classe": "s.f.", "definicao": "Lugar muito longe, lá no fim do mundo.", "exemplo": "Foi morar lá na Caixa-prego, depois da última parada."}
+    },
+    {
+      "id": "e-caroco", "frase": "Ê caroço!", "colecao": "acao", "confirmar": true,
+      "linhas": [{"t": "Ê", "f": "script", "w": 0.14}, {"t": "CAROÇO!", "w": 1}],
+      "bolso": ["Ê", "CAROÇO!"],
+      "verbete": {"palavra": "ca·ro·ço", "classe": "s.m.", "definicao": "Coisa difícil, encrenca, situação complicada.", "exemplo": "Prova de cálculo amanhã? Ê caroço!"}
+    },
+    {
+      "id": "moleque-doido", "frase": "Moleque doido!", "colecao": "acao", "dupla": "toma-tua-merenda",
+      "linhas": [{"t": "Moleque", "f": "script", "w": 0.7}, {"t": "DOIDO!", "w": 1}],
+      "bolso": ["MOLEQUE", "DOIDO!"],
+      "verbete": {"palavra": "mo·le·que doi·do", "classe": "expr.", "definicao": "Quem apronta e ainda ri. Dito com espanto e carinho.", "exemplo": "Pulou do barco antes de atracar, moleque doido!"}
+    }
+  ]
+}
