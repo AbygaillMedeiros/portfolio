@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 """Gera todas as estampas da marca em SVG (medidas reais em milímetros).
 
+Estilo: letra à mão (pincel, marcador, assinatura), com traço vermelho de
+destaque, rabiscos desenhados e uma linha de máquina de escrever.
+
 Uso:
     pip install fonttools uharfbuzz brotli
     python3 marca-camisetas/ferramentas/gerar_artes.py
 
-Edite marca-camisetas/dados/frases.json (nome da marca, frases, verbetes, cores)
-e rode de novo: todas as artes são refeitas. Depois rode exportar_png.js para
-gerar os PNGs em 300 dpi que vão para a gráfica de DTF.
+Edite marca-camisetas/dados/frases.json e rode de novo. Depois rode
+exportar_png.js (PNG 300 dpi para a gráfica) e gerar_mockups.py (fotos das camisas).
 
-Todo texto vira curva (path), então o arquivo abre igual em qualquer computador,
-sem precisar instalar fonte.
+Todo texto vira curva (path): o arquivo abre igual em qualquer computador.
 """
 import io
 import json
 import math
+import random
 import re
+import shutil
 from pathlib import Path
 
 import uharfbuzz as hb
@@ -31,24 +34,19 @@ SAIDA = RAIZ / "artes" / "svg"
 
 DADOS = json.loads((RAIZ / "dados" / "frases.json").read_text(encoding="utf-8"))
 MARCA = DADOS["marca"]
-ESCURO = DADOS["cores"]["escuro"]
-CREME = DADOS["cores"]["creme"]
-
-# Tamanhos máximos de impressão (mm)
-FRENTE_MAX = (280, 300)   # frente ou costas
-BOLSO_MAX = (90, 80)      # peito / bolso
-NUCA_LARG = 90            # verbete abaixo da gola
-MANGA = 70                # ícones de manga
+CORES = DADOS["cores"]
+ACENTO = CORES["acento"]
 
 ARQ_FONTES = {
-    "slab": "alfa-slab-one-latin-400-normal.woff",
-    "bungee": "bungee-latin-400-normal.woff",
-    "chango": "chango-latin-400-normal.woff",
-    "ultra": "ultra-latin-400-normal.woff",
-    "script": "lobster-latin-400-normal.woff",
-    "serif": "libre-baskerville-latin-400-normal.woff",
-    "serif_i": "libre-baskerville-latin-400-italic.woff",
-    "serif_b": "libre-baskerville-latin-700-normal.woff",
+    "pincel": "mr-dafoe-latin-400-normal.woff",
+    "marcador": "sedgwick-ave-display-latin-400-normal.woff",
+    "assinatura": "water-brush-latin-400-normal.woff",
+    "rabisco": "rock-salt-latin-400-normal.woff",
+    "maquina": "special-elite-latin-400-normal.woff",
+    "mono": "courier-prime-latin-400-normal.woff",
+    "mono_b": "courier-prime-latin-700-normal.woff",
+    "mono_i": "courier-prime-latin-400-italic.woff",
+    "lista": "bebas-neue-latin-400-normal.woff",
 }
 
 
@@ -97,7 +95,7 @@ class Fonte:
         return pen.getCommands(), caixa.bounds
 
     def em_arco(self, texto, tam, cx, cy, raio, topo=True, espaco=0.0):
-        """Texto curvado num círculo (selo). topo=True lê por cima, False por baixo."""
+        """Texto curvado num círculo (selo)."""
         s = tam / self.upem
         glifos = self.moldar(texto)
         total = sum(p.x_advance * s + espaco for _, p in glifos) - espaco
@@ -119,58 +117,109 @@ class Fonte:
 F = {k: Fonte(v) for k, v in ARQ_FONTES.items()}
 
 
-# ---------------------------------------------------------------- ornamentos
+# ---------------------------------------------------------------- traço de pincel
 
-def onda(x0, larg, y_meio, esp, periodos=3):
-    """Faixa ondulada (o banzeiro) como forma fechada."""
-    amp = esp * 1.1
-    n = 90
-    topo, base = [], []
-    for i in range(n + 1):
-        x = x0 + larg * i / n
-        y = y_meio + amp * math.sin(2 * math.pi * periodos * i / n)
-        topo.append((x, y - esp / 2))
-        base.append((x, y + esp / 2))
-    pts = topo + base[::-1]
-    d = "M" + " L".join(f"{num(x)} {num(y)}" for x, y in pts) + " Z"
-    return d, (x0, y_meio - amp - esp / 2, x0 + larg, y_meio + amp + esp / 2)
-
-
-def losango(cx, cy, r):
-    return f"M{num(cx)} {num(cy - r)} L{num(cx + r * .7)} {num(cy)} L{num(cx)} {num(cy + r)} L{num(cx - r * .7)} {num(cy)} Z"
-
-
-def brilho(cx, cy, r):
-    """Estrela de quatro pontas."""
-    k = r * 0.22
-    return (f"M{num(cx)} {num(cy - r)} Q{num(cx + k)} {num(cy - k)} {num(cx + r)} {num(cy)} "
-            f"Q{num(cx + k)} {num(cy + k)} {num(cx)} {num(cy + r)} "
-            f"Q{num(cx - k)} {num(cy + k)} {num(cx - r)} {num(cy)} "
-            f"Q{num(cx - k)} {num(cy - k)} {num(cx)} {num(cy - r)} Z")
+def suavizar(pts, n=14):
+    """Curva Catmull-Rom passando pelos pontos."""
+    if len(pts) < 3:
+        (x0, y0), (x1, y1) = pts
+        return [(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n) for i in range(n + 1)]
+    p = [pts[0]] + list(pts) + [pts[-1]]
+    saida = []
+    for i in range(1, len(p) - 2):
+        p0, p1, p2, p3 = p[i - 1], p[i], p[i + 1], p[i + 2]
+        for k in range(n):
+            t = k / n
+            t2, t3 = t * t, t * t * t
+            saida.append(tuple(0.5 * (2 * p1[j] + (-p0[j] + p2[j]) * t + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2
+                                      + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3) for j in (0, 1)))
+    saida.append(pts[-1])
+    return saida
 
 
-def ornamento(tipo, B, w, y_topo, esp):
-    larg = B * w
-    x0 = (B - larg) / 2
-    if tipo == "onda":
-        return onda(x0, larg, y_topo + esp * 1.6, esp)
-    r = larg / 7
-    cy = y_topo + r
-    if tipo == "losangos":
-        d = " ".join([losango(B / 2 - larg / 2 + r * .7, cy, r * .6), losango(B / 2, cy, r),
-                      losango(B / 2 + larg / 2 - r * .7, cy, r * .6)])
-    else:  # estrelas
-        d = " ".join([brilho(B / 2 - larg / 2 + r * .6, cy, r * .6), brilho(B / 2, cy, r),
-                      brilho(B / 2 + larg / 2 - r * .6, cy, r * .6)])
-    return d, (x0, y_topo, x0 + larg, y_topo + 2 * r)
+def pincelada(pts, larg, ataque=0.12, saida=0.5, minimo=0.14):
+    """Traço que engrossa rápido e afina devagar, como pincel. Retorna (path d, pontos)."""
+    P = suavizar(pts)
+    dist = [0.0]
+    for a, b in zip(P, P[1:]):
+        dist.append(dist[-1] + math.hypot(b[0] - a[0], b[1] - a[1]))
+    total = dist[-1] or 1
+    esq, dir_ = [], []
+    for i, (x, y) in enumerate(P):
+        t = dist[i] / total
+        w = 1.0
+        if t < ataque:
+            w *= (t / ataque) ** 0.5
+        if t > 1 - saida:
+            w *= ((1 - t) / saida) ** 0.8
+        w = larg * max(minimo, w) / 2
+        a = P[max(0, i - 1)]
+        b = P[min(len(P) - 1, i + 1)]
+        tx, ty = b[0] - a[0], b[1] - a[1]
+        n = math.hypot(tx, ty) or 1
+        nx, ny = -ty / n, tx / n
+        esq.append((x + nx * w, y + ny * w))
+        dir_.append((x - nx * w, y - ny * w))
+    poli = esq + dir_[::-1]
+    d = "M" + " L".join(f"{num(x)} {num(y)}" for x, y in poli) + " Z"
+    return d, poli
+
+
+def circulo(cx, cy, r):
+    return (f"M{num(cx - r)} {num(cy)} A{num(r)} {num(r)} 0 1 0 {num(cx + r)} {num(cy)} "
+            f"A{num(r)} {num(r)} 0 1 0 {num(cx - r)} {num(cy)} Z"), [(cx - r, cy - r), (cx + r, cy + r)]
+
+
+# Rabiscos desenhados à mão, numa caixa 1 x 1 (y para baixo).
+def _espiral(voltas, r0, r1, n=60):
+    return [(0.5 + (r0 + (r1 - r0) * i / n) * math.cos(2 * math.pi * voltas * i / n),
+             0.5 + (r0 + (r1 - r0) * i / n) * math.sin(2 * math.pi * voltas * i / n)) for i in range(n + 1)]
+
+
+RABISCOS = {
+    "estrela": [[(0.5, 0.0), (0.52, 0.5), (0.5, 1.0)], [(0.06, 0.26), (0.5, 0.5), (0.94, 0.74)],
+                [(0.08, 0.76), (0.5, 0.5), (0.92, 0.24)]],
+    "coracao": [[(0.52, 0.96), (0.16, 0.6), (0.06, 0.26), (0.28, 0.06), (0.5, 0.28), (0.72, 0.05),
+                 (0.94, 0.24), (0.86, 0.58), (0.5, 0.98)]],
+    "faiscas": [[(0.24, 0.66), (0.08, 0.04)], [(0.44, 0.62), (0.7, 0.08)], [(0.56, 0.84), (1.0, 0.62)]],
+    "seta": [[(0.0, 0.85), (0.3, 0.42), (0.68, 0.3), (1.0, 0.42)], [(0.74, 0.12), (1.0, 0.42), (0.72, 0.66)]],
+    "olho": [[(0.0, 0.52), (0.5, 0.12), (1.0, 0.5)], [(0.02, 0.5), (0.5, 0.9), (0.98, 0.52)],
+             [(0.3, 0.12), (0.22, -0.12)], [(0.5, 0.06), (0.5, -0.2)], [(0.7, 0.12), (0.78, -0.12)]],
+    "rabisco": [[(0.06 + 0.82 * t + 0.13 * math.cos(6 * math.pi * t), 0.5 + 0.34 * math.sin(6 * math.pi * t))
+                 for t in [i / 40 for i in range(41)]]],
+    "cheiro": [[(c + 0.07 * math.sin(4 * math.pi * y), 1 - y) for y in [i / 12 for i in range(13)]] for c in (0.18, 0.5, 0.82)],
+    "coroa": [[(0.04, 0.95), (0.08, 0.22), (0.3, 0.62), (0.5, 0.02), (0.7, 0.62), (0.92, 0.22), (0.96, 0.95)],
+              [(0.0, 0.92), (0.5, 0.97), (1.0, 0.9)]],
+    "x": [[(0.06, 0.08), (0.5, 0.52), (0.95, 0.92)], [(0.9, 0.04), (0.48, 0.5), (0.08, 0.96)]],
+    "brilho": [[(0.3, 0.0), (0.3, 0.7)], [(0.0, 0.35), (0.6, 0.35)], [(0.82, 0.55), (0.82, 1.0)], [(0.62, 0.78), (1.0, 0.78)]],
+    "alvo": [_espiral(1.7, 0.06, 0.48)],
+    "velocidade": [[(0.0, 0.18), (0.8, 0.2)], [(0.14, 0.5), (1.0, 0.5)], [(0.04, 0.82), (0.66, 0.8)]],
+}
+PONTOS = {"migalhas": [(0.15, 0.7, 0.09), (0.42, 0.4, 0.12), (0.7, 0.75, 0.07), (0.88, 0.3, 0.1), (0.55, 0.05, 0.06)],
+          "olho": [(0.5, 0.5, 0.15)]}
+
+
+def rabisco(nome, x, y, tam, traco, semente=0):
+    """Desenha um rabisco na caixa (x, y, tam). Retorna (paths, pontos)."""
+    rnd = random.Random(semente)
+    ds, pts = [], []
+    for linha in RABISCOS.get(nome, []):
+        p = [(x + (u + rnd.uniform(-0.02, 0.02)) * tam, y + (v + rnd.uniform(-0.02, 0.02)) * tam) for u, v in linha]
+        d, poli = pincelada(p, traco, ataque=0.1, saida=0.6, minimo=0.25)
+        ds.append(d)
+        pts += poli
+    for u, v, r in PONTOS.get(nome, []):
+        d, caixa = circulo(x + u * tam, y + v * tam, r * tam)
+        ds.append(d)
+        pts += caixa
+    return ds, pts
 
 
 # ---------------------------------------------------------------- SVG
 
 def svg(larg, alt, corpo, titulo=""):
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
-            f'width="{num(larg)}mm" height="{num(alt)}mm" viewBox="0 0 {num(larg)} {num(alt)}">'
-            f"<title>{titulo}</title>{corpo}</svg>\n")
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{num(larg)}mm" height="{num(alt)}mm" '
+            f'viewBox="0 0 {num(larg)} {num(alt)}"><title>{titulo}</title>{corpo}</svg>\n')
 
 
 def salvar(pasta, nome, conteudo):
@@ -179,106 +228,122 @@ def salvar(pasta, nome, conteudo):
     (p / f"{nome}.svg").write_text(conteudo, encoding="utf-8")
 
 
-def paleta(col, variante):
-    escura = variante == "escura"
-    return {
-        "contorno": CREME if escura else ESCURO,
-        "filete": col["filete_escura"] if escura else col["filete_clara"],
-        "preench": col["preenchimento"],
-        "sombra": col["sombra"],
-    }
+def tinta(var):
+    return CORES["tinta_clara"] if var == "escura" else CORES["tinta_escura"]
 
 
-def letreiro(formas, legendas, pal, o, a, prof, t):
-    """Efeito de letreiro de barco: contorno grosso, filete fino e sombra 3D.
+class Composicao:
+    """Junta peças (paths com cor), gira o conjunto e calcula o tamanho final."""
 
-    formas: paths que recebem o efeito. legendas: paths de cor única.
-    o = contorno (mm, para fora da letra), a = filete, prof = profundidade da sombra,
-    t = contorno fino em volta da sombra.
-    """
-    defs = "".join(f'<path id="f{i}" d="{d}"/>' for i, d in enumerate(formas))
-    passo = o * 0.6
-    n = max(1, math.ceil(prof / passo))
-    vx, vy = 0.55, 0.835
-    camadas = []
-    usos = lambda i: "".join(f'<use xlink:href="#f{k}" x="{num(vx * prof * i / n)}" y="{num(vy * prof * i / n)}"/>'
-                              for k in range(len(formas)))
-    if prof > 0:
-        camadas.append(f'<g fill="{pal["contorno"]}" stroke="{pal["contorno"]}" stroke-width="{num(2 * o)}" '
-                       f'stroke-linejoin="round">{"".join(usos(i) for i in range(n + 1))}</g>')
-        camadas.append(f'<g fill="{pal["sombra"]}" stroke="{pal["sombra"]}" stroke-width="{num(2 * (o - t))}" '
-                       f'stroke-linejoin="round">{"".join(usos(i) for i in range(1, n + 1))}</g>')
-    todos = usos(0)
-    camadas.append(f'<g fill="none" stroke="{pal["contorno"]}" stroke-width="{num(2 * o)}" stroke-linejoin="round">{todos}</g>')
-    if a > 0:
-        camadas.append(f'<g fill="none" stroke="{pal["filete"]}" stroke-width="{num(2 * a)}" stroke-linejoin="round">{todos}</g>')
-    camadas.append(f'<g fill="{pal["preench"]}">{todos}</g>')
-    for d in legendas:
-        camadas.append(f'<path fill="{pal["contorno"]}" d="{d}"/>')
-    return f"<defs>{defs}</defs>{''.join(camadas)}"
+    def __init__(self):
+        self.pecas = []   # (cor, d)
+        self.pontos = []
 
+    def add(self, cor, d, pontos):
+        self.pecas.append((cor, d))
+        self.pontos += pontos
 
-def compor(linhas, B, fonte_padrao, intervalo, esp_onda):
-    """Empilha as linhas centralizadas numa largura B. Retorna formas, legendas e altura."""
-    formas, legendas = [], []
-    y = 0.0
-    for ln in linhas:
-        if "orn" in ln:
-            y += esp_onda * 0.8  # respiro extra: contorno + sombra da linha de cima
-            d, (x0, y0, x1, y1) = ornamento(ln["orn"], B, ln["w"], y, esp_onda)
-            formas.append(d)
-            y = y1 + intervalo
-            continue
-        legenda = "legenda" in ln
-        if legenda:
-            y += esp_onda * 0.9
-        texto = ln["legenda"] if legenda else ln["t"]
-        fonte = F["serif_i"] if legenda else F[ln.get("f", fonte_padrao)]
-        _, (x0, y0, x1, y1) = fonte.caminho(texto, 100)
-        esc = B * ln["w"] / (x1 - x0)
-        tam = 100 * esc
-        base = y - y0 * esc
-        x = (B - (x1 - x0) * esc) / 2 - x0 * esc
-        d, (bx0, by0, bx1, by1) = fonte.caminho(texto, tam, x, base)
-        (legendas if legenda else formas).append(d)
-        y = by1 + intervalo * (0.7 if legenda else 1)
-    return formas, legendas, y - intervalo
+    def texto(self, cor, fonte, txt, tam, x, y, espaco=0.0):
+        d, (x0, y0, x1, y1) = fonte.caminho(txt, tam, x, y, espaco)
+        self.add(cor, d, [(x0, y0), (x1, y1), (x0, y1), (x1, y0)])
+        return x0, y0, x1, y1
 
-
-def arte_frase(linhas, fonte_padrao, pal, largmax, altmax, o, a, prof, t, intervalo, esp_onda):
-    margem = o + prof + 1.5
-    B = largmax - 2 * margem
-    for _ in range(12):
-        formas, legendas, alt = compor(linhas, B, fonte_padrao, intervalo, esp_onda)
-        if alt + 2 * margem <= altmax:
-            break
-        B *= (altmax - 2 * margem) / alt * 0.995
-    W, H = B + 2 * margem, alt + 2 * margem
-    corpo = f'<g transform="translate({num(margem)} {num(margem)})">{letreiro(formas, legendas, pal, o, a, prof, t)}</g>'
-    return W, H, corpo
+    def fechar(self, giro=0.0, margem=2.0, titulo=""):
+        xs = [p[0] for p in self.pontos]
+        ys = [p[1] for p in self.pontos]
+        cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+        a = math.radians(giro)
+        rot = [((x - cx) * math.cos(a) - (y - cy) * math.sin(a), (x - cx) * math.sin(a) + (y - cy) * math.cos(a))
+               for x, y in self.pontos]
+        x0, y0 = min(p[0] for p in rot), min(p[1] for p in rot)
+        x1, y1 = max(p[0] for p in rot), max(p[1] for p in rot)
+        W, H = x1 - x0 + 2 * margem, y1 - y0 + 2 * margem
+        tx, ty = margem - x0, margem - y0
+        grupos = {}
+        for cor, d in self.pecas:
+            grupos.setdefault(cor, []).append(d)
+        corpo = "".join(f'<path fill="{c}" d="{" ".join(ds)}"/>' for c, ds in grupos.items())
+        corpo = f'<g transform="translate({num(tx)} {num(ty)}) rotate({num(giro)}) translate({num(-cx)} {num(-cy)})">{corpo}</g>'
+        return W, H, svg(W, H, corpo, titulo)
 
 
 # ---------------------------------------------------------------- frases
 
+def arte_frase(fr, var, larg, alt_max, traco, com_nota=True, semente=0):
+    col = DADOS["colecoes"][fr["colecao"]]
+    fonte = F[fr.get("fonte", col["fonte"])]
+    cor = tinta(var)
+    c = Composicao()
+    _, (sx0, sy0, sx1, sy1) = fonte.caminho(fr["script"], 100)
+    pre = fr.get("pre")
+    H100 = sy1 - sy0
+    empilhar = pre and ((sx1 - sx0) / H100 > 3.6 or fr.get("empilhar"))
+    if empilhar:
+        # máquina de escrever em cima, letra à mão embaixo
+        tam_pre100 = 0.36 * H100
+        _, (px0, py0, px1, py1) = F["maquina"].caminho(pre, tam_pre100)
+        esc = min(larg / (sx1 - sx0), alt_max / (H100 * 1.55))
+        tam = 100 * esc
+        c.texto(ACENTO, F["maquina"], pre, tam_pre100 * esc, -px0 * esc + 0.03 * larg, -py0 * esc)
+        topo = (py1 - py0) * esc + 0.1 * H100 * esc
+        x0s, y0s, x1s, y1s = c.texto(cor, fonte, fr["script"], tam, -sx0 * esc, topo - sy0 * esc)
+        giro = -5
+    elif pre:
+        # estilo "produzido por": máquina de escrever em vermelho + letra à mão
+        tam_pre100 = 0.34 * (sy1 - sy0)
+        _, (px0, py0, px1, py1) = F["maquina"].caminho(pre, tam_pre100)
+        vao100 = 0.06 * (sy1 - sy0)
+        larg100 = (px1 - px0) + vao100 + (sx1 - sx0)
+        esc = min(larg / larg100, alt_max / ((sy1 - sy0) * 1.25))
+        tam = 100 * esc
+        base = -sy0 * esc
+        c.texto(ACENTO, F["maquina"], pre, tam_pre100 * esc, -px0 * esc, base)
+        xs = ((px1 - px0) + vao100) * esc
+        x0s, y0s, x1s, y1s = c.texto(cor, fonte, fr["script"], tam, xs - sx0 * esc, base)
+        giro = -3
+    else:
+        esc = min(larg / (sx1 - sx0), alt_max / ((sy1 - sy0) * 1.35))
+        tam = 100 * esc
+        base = -sy0 * esc
+        x0s, y0s, x1s, y1s = c.texto(cor, fonte, fr["script"], tam, -sx0 * esc, base)
+        giro = -6
+        # traço vermelho sob a palavra
+        ys = base + 0.07 * tam
+        Wt = x1s - x0s
+        d, p = pincelada([(x0s + 0.04 * Wt, ys + 0.03 * tam), (x0s + 0.4 * Wt, ys + 0.07 * tam),
+                          (x0s + 0.8 * Wt, ys + 0.02 * tam), (x1s + 0.03 * Wt, ys - 0.07 * tam)], traco * 1.5)
+        c.add(ACENTO, d, p)
+        if com_nota and fr.get("nota"):
+            tn = 3.7 * traco
+            nota = f"({fr['nota']})"
+            ln = F["maquina"].largura(nota, tn)
+            c.texto(cor, F["maquina"], nota, tn, x1s - ln, max(ys + 0.13 * tam, y1s + 0.01 * tam) + tn * 1.05)
+    # rabisco vermelho
+    nome = fr.get("doodle")
+    if nome:
+        H = y1s - y0s
+        dt = 0.42 * H if pre else 0.36 * H
+        if nome == "velocidade" and not pre:
+            dx, dy = x0s - 1.15 * dt, y0s + 0.35 * H
+        elif nome == "cheiro":
+            dx, dy = (x0s + x1s) / 2 - dt / 2, y0s - 1.05 * dt
+        else:
+            dx, dy = x1s - 0.2 * dt, y0s - 0.62 * dt
+        ds, pts = rabisco(nome, dx, dy, dt, traco, semente)
+        for d in ds:
+            c.add(ACENTO, d, [])
+        c.pontos += pts
+    return c.fechar(giro, margem=traco + 1, titulo=fr["frase"])
+
+
 def gerar_frases():
-    for fr in DADOS["frases"]:
+    for i, fr in enumerate(DADOS["frases"]):
         col = DADOS["colecoes"][fr["colecao"]]
         for var in ("clara", "escura"):
-            pal = paleta(col, var)
-            # Frente / costas: 28 cm de largura
-            W, H, corpo = arte_frase(fr["linhas"], col["fonte"], pal, *FRENTE_MAX,
-                                     o=2.4, a=0.9, prof=5.5, t=0.8, intervalo=6.5, esp_onda=4.2)
-            salvar("frente", f'{fr["id"]}-{var}', svg(W, H, corpo, fr["frase"]))
-            # Bolso / peito: 9 cm, efeito simplificado (detalhe pequeno some no DTF)
-            # mesmo corpo de letra em todas as linhas (a mais longa ocupa a largura toda)
-            fb = F[col["fonte"]]
-            largs = [fb.caminho(t, 100)[1] for t in fr["bolso"]]
-            largs = [b[2] - b[0] for b in largs]
-            linhas_b = [{"t": t, "w": lw / max(largs)} for t, lw in zip(fr["bolso"], largs)]
-            W, H, corpo = arte_frase(linhas_b, col["fonte"], pal, *BOLSO_MAX,
-                                     o=1.1, a=0, prof=1.8, t=0.5, intervalo=2.6, esp_onda=2)
-            salvar("bolso", f'{fr["id"]}-{var}', svg(W, H, corpo, fr["frase"]))
-            # Nuca: verbete de dicionário
+            _, _, s = arte_frase(fr, var, 255, 150, traco=2.6, semente=i)
+            salvar("frente", f'{fr["id"]}-{var}', s)
+            _, _, s = arte_frase(fr, var, 86, 55, traco=1.15, com_nota=False, semente=i)
+            salvar("bolso", f'{fr["id"]}-{var}', s)
             salvar("nuca", f'{fr["id"]}-{var}', verbete(fr, col, var))
 
 
@@ -296,243 +361,167 @@ def quebrar(fonte, texto, tam, larg):
 
 
 def aspas(texto):
-    """Troca aspas retas por aspas tipográficas."""
-    return re.sub(r'"([^"]*)"', "\u201c\\1\u201d", texto)
+    return re.sub(r'"([^"]*)"', "“\\1”", texto)
 
 
 def verbete(fr, col, var):
     v = fr["verbete"]
-    cor = CREME if var == "escura" else ESCURO
-    destaque = col["preenchimento"]
-    L, m = NUCA_LARG, 1.0
-    paths = []
-    y = m + 6.2
-    # palavra + classe gramatical cabem numa linha só; se não couber, diminui
-    tam = 8.0
-    while F["serif_b"].largura(v["palavra"], tam) + 2.2 + F["serif_i"].largura(v["classe"], tam / 2) > L - 2 * m:
+    cor = tinta(var)
+    L, m = 90, 1.0
+    c = Composicao()
+    y = m + 6
+    tam = 7.5
+    while F["mono_b"].largura(v["palavra"], tam) + 2 + F["mono_i"].largura(v["classe"], 3.8) > L - 2 * m:
         tam -= 0.25
-    d, (_, _, x1, _) = F["serif_b"].caminho(v["palavra"], tam, m, y)
-    paths.append(d)
-    d, _ = F["serif_i"].caminho(v["classe"], max(3.4, tam / 2), x1 + 2.2, y)
-    paths.append(d)
-    y += 2.6
-    regua = f'<rect x="{num(m)}" y="{num(y)}" width="{num(L - 2 * m)}" height="0.5" fill="{destaque}"/>'
-    y += 5.2
-    for ln in quebrar(F["serif"], aspas(v["definicao"]), 3.9, L - 2 * m):
-        d, _ = F["serif"].caminho(ln, 3.9, m, y)
-        paths.append(d)
-        y += 5.2
-    y += 0.6
-    for ln in quebrar(F["serif_i"], f"“{v['exemplo']}”", 3.9, L - 2 * m):
-        d, _ = F["serif_i"].caminho(ln, 3.9, m, y)
-        paths.append(d)
-        y += 5.2
-    y += 1.6
-    assinatura = f'{MARCA["nome"]}  ·  {MARCA["cidade"].upper()}'
-    d, (_, _, ax1, _) = F["bungee"].caminho(assinatura, 3, m + 5, y, espaco=0.35)
-    paths.append(d)
-    marca = f'<path fill="{destaque}" d="{losango(m + 1.6, y - 1.1, 1.7)}"/>'
-    H = y + m + 1
-    corpo = f'<g fill="{cor}">' + "".join(f'<path d="{p}"/>' for p in paths) + f"</g>{regua}{marca}"
-    return svg(L, H, corpo, f'Verbete: {fr["frase"]}')
+    _, _, x1, _ = c.texto(cor, F["mono_b"], v["palavra"], tam, m, y)
+    c.texto(cor, F["mono_i"], v["classe"], 3.8, x1 + 2, y)
+    d, p = pincelada([(m, y + 2.2), (L * 0.5, y + 2.9), (L - m, y + 1.8)], 1.1, minimo=0.3)
+    c.add(ACENTO, d, p)
+    y += 7.6
+    for ln in quebrar(F["mono"], aspas(v["definicao"]), 3.7, L - 2 * m):
+        c.texto(cor, F["mono"], ln, 3.7, m, y)
+        y += 5
+    y += 0.5
+    for ln in quebrar(F["mono_i"], f"“{v['exemplo']}”", 3.7, L - 2 * m):
+        c.texto(cor, F["mono_i"], ln, 3.7, m, y)
+        y += 5
+    y += 3
+    _, _, ax1, _ = c.texto(cor, F["pincel"], MARCA["nome"], 7, m, y + 1)
+    c.texto(ACENTO, F["maquina"], f'· {MARCA["cidade"].lower()}', 3.4, ax1 + 2, y)
+    return c.fechar(0, margem=1, titulo=f'Verbete: {fr["frase"]}')[2]
+
+
+# ---------------------------------------------------------------- costas: listas e turnê
+
+def lista(item, var):
+    cor = tinta(var)
+    c = Composicao()
+    f = F["lista"]
+    cap = f.caminho("H", 100)[1]
+    cap = cap[3] - cap[1]
+    largs = [f.largura(t, 100) for t in item["linhas"]]
+    tam = min(230 / max(largs) * 100, 27 / cap * 100)
+    capmm = cap * tam / 100
+    y = capmm
+    for t in item["linhas"]:
+        w = f.largura(t, tam)
+        c.texto(cor, f, t, tam, -w / 2, y)
+        y += capmm * 1.3
+    rod = item["rodape"]
+    w = F["maquina"].largura(rod, 8)
+    c.texto(ACENTO, F["maquina"], rod, 8, -w / 2, y + 6)
+    return c.fechar(0, margem=1.5, titulo=item["nome"])[2]
+
+
+def turne_costas(t, var):
+    cor = tinta(var)
+    c = Composicao()
+    _, (sx0, sy0, sx1, sy1) = F["pincel"].caminho(t["titulo"], 100)
+    esc = 230 / (sx1 - sx0)
+    tam = 100 * esc
+    base = -sy0 * esc
+    x0, y0, x1, y1 = c.texto(cor, F["pincel"], t["titulo"], tam, -115 - sx0 * esc, base)
+    ys = base + 0.08 * tam
+    d, p = pincelada([(x0 + 10, ys + 3), (0, ys + 6), (x1 + 6, ys - 4)], 4)
+    c.add(ACENTO, d, p)
+    sub = t["subtitulo"]
+    w = F["maquina"].largura(sub, 11)
+    y = y1 + 22
+    c.texto(ACENTO, F["maquina"], sub, 11, -w / 2, y)
+    y += 24
+    f = F["lista"]
+    cap = f.caminho("H", 100)[1]
+    tam_l = 15 / ((cap[3] - cap[1]) / 100)
+    for data, cidade in t["datas"]:
+        wd = F["maquina"].largura(data, 7.5)
+        c.texto(ACENTO, F["maquina"], data, 7.5, -62 - wd, y - 1)
+        c.texto(cor, f, cidade, tam_l, -52, y)
+        y += 23
+    return c.fechar(0, margem=2, titulo=t["nome"])[2]
+
+
+def turne_frente(t, var):
+    cor = tinta(var)
+    c = Composicao()
+    _, (sx0, sy0, sx1, sy1) = F["pincel"].caminho(MARCA["nome"], 100)
+    esc = 95 / (sx1 - sx0)
+    base = -sy0 * esc
+    x0, y0, x1, y1 = c.texto(cor, F["pincel"], MARCA["nome"], 100 * esc, -sx0 * esc, base)
+    linha = f'turnê {t["titulo"].lower()} · 2026'
+    w = F["maquina"].largura(linha, 4.2)
+    c.texto(ACENTO, F["maquina"], linha, 4.2, (x0 + x1) / 2 - w / 2, y1 + 7)
+    return c.fechar(-4, margem=1.5, titulo=t["nome"])[2]
 
 
 # ---------------------------------------------------------------- marca
 
+def assinatura(var, larg, traco, nota=None):
+    fr = {"script": MARCA["nome"], "colecao": "saudacao", "frase": MARCA["nome"], "doodle": None,
+          "nota": nota, "fonte": "pincel"}
+    return arte_frase(fr, var, larg, larg, traco, com_nota=bool(nota))[2]
+
+
 def gerar_marca():
-    col = {"preenchimento": "#F2B632", "sombra": "#1F5C45",
-           "filete_clara": CREME, "filete_escura": "#1F5C45"}
     for var in ("clara", "escura"):
-        pal = paleta(col, var)
-        escura = var == "escura"
-        cont = pal["contorno"]
+        cor = tinta(var)
+        salvar("marca", f"assinatura-{var}", assinatura(var, 80, 1.1))
+        salvar("marca", f"logo-{var}", assinatura(var, 200, 2.4, nota=MARCA["slogan"].rstrip(".")))
 
-        # Logotipo
-        linhas = [{"t": MARCA["nome"], "f": "slab", "w": 1},
-                  {"legenda": MARCA["slogan"], "w": 0.42}]
-        W, H, corpo = arte_frase(linhas, "slab", pal, 200, 120, o=2, a=0.8, prof=4.5, t=0.7,
-                                 intervalo=4.5, esp_onda=4.5)
-        salvar("marca", f"logo-{var}", svg(W, H, corpo, MARCA["nome"]))
-
-        # Selo redondo: "feito no Amazonas" (barra, manga ou etiqueta)
+        # Selo redondo
         R = 30
-        c = R + 1.5
-        topo = F["bungee"].em_arco(MARCA["nome"], 6.2, c, c, R - 7.8, topo=True, espaco=0.5)
-        baixo = F["bungee"].em_arco(MARCA["selo"], 4.4, c, c, R - 4.6, topo=False, espaco=0.35)
-        corpo = (f'<circle cx="{c}" cy="{c}" r="{R}" fill="{CREME if escura else "#F6EBD3"}" stroke="{cont}" stroke-width="2"/>'
-                 f'<circle cx="{c}" cy="{c}" r="{R - 3}" fill="none" stroke="{ESCURO}" stroke-width="0.6"/>'
-                 f'<path fill="{ESCURO}" d="{topo} {baixo}"/>'
-                 f'<path fill="#E0442F" d="{losango(c - R + 6.5, c, 1.6)} {losango(c + R - 6.5, c, 1.6)}"/>'
-                 f'<g transform="translate({num(c - 13)} {num(c - 13)}) scale({num(26 / 70)})">{icone_encontro(ESCURO)}</g>')
-        salvar("marca", f"selo-{var}", svg(2 * c, 2 * c, corpo, "Selo Feito no Amazonas"))
+        cc = R + 1.5
+        c = Composicao()
+        c.add(cor, F["maquina"].em_arco(MARCA["nome"].upper(), 6, cc, cc, R - 8.5, True, espaco=1.2), [(0, 0), (2 * cc, 2 * cc)])
+        c.add(cor, F["maquina"].em_arco(MARCA["selo"].upper(), 4.6, cc, cc, R - 4.8, False, espaco=0.7), [])
+        anel = (f"M{cc - R} {cc} A{R} {R} 0 1 0 {cc + R} {cc} A{R} {R} 0 1 0 {cc - R} {cc} Z "
+                f"M{cc - R + 1.2} {cc} A{R - 1.2} {R - 1.2} 0 1 1 {cc + R - 1.2} {cc} A{R - 1.2} {R - 1.2} 0 1 1 {cc - R + 1.2} {cc} Z")
+        c.add(cor, anel, [])
+        _, (a0, b0, a1, b1) = F["pincel"].caminho("P", 100)
+        esc = 26 / (b1 - b0)
+        c.texto(cor, F["pincel"], "P", 100 * esc, cc - (a0 + a1) / 2 * esc, cc + 13 - b1 * esc)
+        d, p = pincelada([(cc - 11, cc + 11), (cc, cc + 12.5), (cc + 12, cc + 8)], 1.6)
+        c.add(ACENTO, d, p)
+        salvar("marca", f"selo-{var}", c.fechar(0, margem=0.5, titulo="Selo")[2])
 
-        # Etiqueta da barra (lateral, perto da costura sem passar por cima)
-        txt = MARCA["nome"]
-        d, (x0, y0, x1, y1) = F["bungee"].caminho(txt, 5.2, 0, 0, espaco=0.5)
-        Wt, Ht = (x1 - x0) + 9, 10
-        fundo, letra = (CREME, ESCURO) if escura else (ESCURO, CREME)
-        d, _ = F["bungee"].caminho(txt, 5.2, 4.5 - x0, Ht / 2 - (y0 + y1) / 2, espaco=0.5)
-        corpo = (f'<rect width="{num(Wt)}" height="{Ht}" rx="1.6" fill="{fundo}"/>'
-                 f'<path fill="{letra}" d="{d}"/>'
-                 f'<path fill="#F2B632" d="{losango(2.2, Ht / 2, 1.3)} {losango(Wt - 2.2, Ht / 2, 1.3)}"/>')
-        salvar("marca", f"etiqueta-barra-{var}", svg(Wt, Ht, corpo, "Etiqueta da barra"))
+        # Etiqueta da barra
+        txt = f'{MARCA["nome"].lower()} · am'
+        d, (x0, y0, x1, y1) = F["maquina"].caminho(txt, 5, 0, 0)
+        Wt, Ht = (x1 - x0) + 8, 9
+        fundo, letra = (CORES["tinta_clara"], CORES["tinta_escura"]) if var == "escura" else (CORES["tinta_escura"], CORES["tinta_clara"])
+        d, _ = F["maquina"].caminho(txt, 5, 4 - x0, Ht / 2 - (y0 + y1) / 2)
+        salvar("marca", f"etiqueta-barra-{var}",
+               svg(Wt, Ht, f'<rect width="{num(Wt)}" height="{Ht}" rx="1" fill="{fundo}"/><path fill="{letra}" d="{d}"/>', "Etiqueta"))
 
         # Mensagem escondida no avesso
-        cor = CREME if escura else ESCURO
-        paths, y = [], 1.5
+        c = Composicao()
+        y = 0
         for i, ln in enumerate(MARCA["avesso"]):
-            fonte = F["script"] if i == len(MARCA["avesso"]) - 1 else F["serif_i"]
-            tam = 9 if fonte is F["script"] else 5
-            larg = fonte.largura(ln, tam)
-            _, (_, by0, _, by1) = fonte.caminho(ln, tam)
-            d, _ = fonte.caminho(ln, tam, (80 - larg) / 2, y - by0)
-            paths.append(d)
-            y += (by1 - by0) + 2.4
-        corpo = f'<path fill="{cor}" d="{" ".join(paths)}"/>'
-        salvar("marca", f"avesso-{var}", svg(80, y, corpo, "Mensagem no avesso"))
+            ultima = i == len(MARCA["avesso"]) - 1
+            fonte, tam = (F["pincel"], 13) if ultima else (F["maquina"], 4.6)
+            w = fonte.largura(ln, tam)
+            y += 9 if ultima else 6.5
+            c.texto(ACENTO if ultima else cor, fonte, ln, tam, -w / 2, y)
+        salvar("marca", f"avesso-{var}", c.fechar(-3, margem=1, titulo="Avesso")[2])
 
-        # Ícones de manga
-        for nome, func in ICONES.items():
-            corpo = func(cont)
-            salvar("manga", f"{nome}-{var}", svg(MANGA, MANGA, corpo, nome))
-
-
-# ---------------------------------------------------------------- ícones (70 x 70 mm)
-
-def icone_guarana(c):
-    folha = (f'<path d="M35 64 C20 58 10 44 12 26 C24 30 34 42 35 64 Z" fill="#3E8A4A" stroke="{c}" stroke-width="1.4" stroke-linejoin="round"/>'
-             f'<path d="M35 64 C50 58 60 44 58 26 C46 30 36 42 35 64 Z" fill="#2F7040" stroke="{c}" stroke-width="1.4" stroke-linejoin="round"/>'
-             f'<path d="M35 8 C34 20 35 30 35 40" fill="none" stroke="{c}" stroke-width="1.6" stroke-linecap="round"/>')
-    frutas = ""
-    for x, y, r in ((24, 28, 11), (46, 28, 11), (35, 45, 12)):
-        frutas += (f'<circle cx="{x}" cy="{y}" r="{r}" fill="#D63A2E" stroke="{c}" stroke-width="1.4"/>'
-                   f'<path d="M{x - r * .55} {y - r * .1} Q{x} {y - r * 1.05} {x + r * .55} {y - r * .1} Q{x + r * .7} {y + r * .7} {x} {y + r * .78} Q{x - r * .7} {y + r * .7} {x - r * .55} {y - r * .1} Z" fill="#FFF6DF" stroke="{c}" stroke-width="1"/>'
-                   f'<circle cx="{x}" cy="{y + r * .18}" r="{r * .38}" fill="#1B1A17"/>'
-                   f'<circle cx="{x - r * .13}" cy="{y + r * .05}" r="{r * .1}" fill="#FFF6DF"/>')
-    return folha + frutas
-
-
-def icone_vitoria_regia(c):
-    cx, cy, R = 31, 42, 25
-    a1, a2 = math.radians(80), math.radians(100)
-    p1 = (cx + R * math.cos(a1), cy + R * math.sin(a1))
-    p2 = (cx + R * math.cos(a2), cy + R * math.sin(a2))
-    folha = f'M{cx} {cy} L{num(p1[0])} {num(p1[1])} A{R} {R} 0 1 0 {num(p2[0])} {num(p2[1])} Z'
-    r2 = R - 2.2
-    q1 = (cx + r2 * math.cos(a1 - .06), cy + r2 * math.sin(a1 - .06))
-    q2 = (cx + r2 * math.cos(a2 + .06), cy + r2 * math.sin(a2 + .06))
-    borda = f'M{num(q1[0])} {num(q1[1])} A{r2} {r2} 0 1 0 {num(q2[0])} {num(q2[1])}'
-    nervuras = "".join(
-        f'<line x1="{cx}" y1="{cy}" x2="{num(cx + 19 * math.cos(math.radians(g)))}" y2="{num(cy + 19 * math.sin(math.radians(g)))}"/>'
-        for g in range(110, 440, 30))
-    petalas = "".join(
-        f'<ellipse cx="53" cy="15.5" rx="3.6" ry="8.5" transform="rotate({g} 53 21)" fill="#F4A6C0" stroke="{c}" stroke-width="1"/>'
-        for g in range(-70, 80, 35))
-    return (f'<path d="{folha}" fill="#5E9E3A" stroke="{c}" stroke-width="1.4" stroke-linejoin="round"/>'
-            f'<path d="{borda}" fill="none" stroke="#A8C64A" stroke-width="2.6"/>'
-            f'<g stroke="#2F6A2A" stroke-width="0.8" stroke-linecap="round">{nervuras}</g>'
-            f'{petalas}<circle cx="53" cy="21" r="3.4" fill="#F2B632" stroke="{c}" stroke-width="1"/>')
-
-
-def icone_tucunare(c):
-    corpo = ("M5 36 C9 24 28 18 48 25 C51 26.5 53 29 54.5 32 L65 22 C62.5 29 62.5 41 65 48 "
-             "L54.5 39 C53 42 51 44.5 48 46 C28 53 9 48 5 36 Z")
-    return (f'<defs><clipPath id="tc"><path d="{corpo}"/></clipPath></defs>'
-            f'<path d="M20 24 C26 11 40 11 48 25 Z" fill="#7C8F2E" stroke="{c}" stroke-width="1.3" stroke-linejoin="round"/>'
-            f'<path d="M28 48 C32 56 40 56 44 46 Z" fill="#E0442F" stroke="{c}" stroke-width="1.3" stroke-linejoin="round"/>'
-            f'<path d="{corpo}" fill="#D9C23D"/>'
-            f'<g clip-path="url(#tc)"><path d="M5 40 C20 50 40 50 56 40 L56 60 L5 60 Z" fill="#F2DC7A"/>'
-            f'<rect x="19" y="10" width="4.5" height="40" rx="2" fill="#2E4A2A"/>'
-            f'<rect x="31" y="10" width="4.5" height="40" rx="2" fill="#2E4A2A"/>'
-            f'<rect x="42.5" y="10" width="4" height="40" rx="2" fill="#2E4A2A"/></g>'
-            f'<path d="{corpo}" fill="none" stroke="{c}" stroke-width="1.4" stroke-linejoin="round"/>'
-            f'<circle cx="58.3" cy="35" r="3.8" fill="#1B1A17" stroke="#F2B632" stroke-width="1.4"/>'
-            f'<path d="M38 36 C40 39 41 41 39 44 C36 42 35 39 38 36 Z" fill="#E0442F" stroke="{c}" stroke-width="0.9"/>'
-            f'<circle cx="12.5" cy="32.5" r="2.8" fill="#E0442F" stroke="{c}" stroke-width="0.9"/>'
-            f'<circle cx="12.2" cy="32.4" r="1.2" fill="#1B1A17"/>'
-            f'<path d="M5.5 37.5 L10 37" stroke="{c}" stroke-width="1" stroke-linecap="round"/>')
-
-
-def icone_encontro(c):
-    cx, cy, R = 35, 35, 30
-    div = f"M{cx} {cy - R} C{cx - 12} {cy - 18} {cx + 12} {cy - 8} {cx} {cy} C{cx - 12} {cy + 8} {cx + 12} {cy + 18} {cx} {cy + R}"
-    esquerda = f"{div} A{R} {R} 0 0 1 {cx} {cy - R} Z"
-    ondas = lambda x, cor: "".join(
-        f'<path d="M{x - 7} {y} q3.5 -2.4 7 0 t7 0" fill="none" stroke="{cor}" stroke-width="1.1" stroke-linecap="round"/>'
-        for y in (20, 34, 48))
-    return (f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="#C7843E"/>'
-            f'<path d="{esquerda}" fill="#1B1A17"/>'
-            f'{ondas(20, "#FFF6DF")}{ondas(50, "#8A5523")}'
-            f'<path d="{div}" fill="none" stroke="#FFF6DF" stroke-width="1"/>'
-            f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="none" stroke="{c}" stroke-width="1.6"/>')
-
-
-def icone_cupula(c):
-    cx, base, topo, rx = 35, 44, 13, 23
-    h = base - topo
-    cores = ["#2E8B57", "#F2B632", "#2F6FA8", "#F2B632"] * 3
-    ss = [math.sin(math.radians(g)) for g in range(-90, 91, 20)]
-    gomos = ""
-
-    def lado(s, subir):
-        a = abs(rx * s)
-        if a < 0.01:
-            return f"L{cx} {topo}" if subir else f"L{cx} {base}"
-        if subir:
-            return f"A{num(a)} {h} 0 0 {1 if s < 0 else 0} {cx} {topo}"
-        return f"A{num(a)} {h} 0 0 {0 if s < 0 else 1} {num(cx + rx * s)} {base}"
-
-    for i in range(len(ss) - 1):
-        s1, s2 = ss[i], ss[i + 1]
-        d = f"M{num(cx + rx * s1)} {base} {lado(s1, True)} {lado(s2, False)} Z"
-        gomos += f'<path d="{d}" fill="{cores[i]}"/>'
-    janelas = "".join(f'<rect x="{x}" y="54" width="3" height="5" rx="1.5" fill="#FFF6DF" stroke="{c}" stroke-width="0.6"/>'
-                      for x in (15, 22, 29, 38, 45, 52))
-    colunas = "".join(f'<line x1="{x}" y1="45" x2="{x}" y2="51" stroke="{c}" stroke-width="0.8"/>' for x in range(16, 56, 6))
-    return (f'<rect x="31.5" y="4" width="7" height="6" fill="#F6EBD3" stroke="{c}" stroke-width="1.1"/>'
-            f'<path d="M30.5 4.5 Q35 -0.5 39.5 4.5 Z" fill="#2E8B57" stroke="{c}" stroke-width="1"/>'
-            f'<rect x="29" y="10" width="12" height="3.4" fill="#F6EBD3" stroke="{c}" stroke-width="1"/>'
-            f'{gomos}<path d="M{cx - rx} {base} A{rx} {h} 0 0 1 {cx + rx} {base} Z" fill="none" stroke="{c}" stroke-width="1.4"/>'
-            f'<rect x="10" y="44" width="50" height="8" fill="#E9A7B5" stroke="{c}" stroke-width="1.3"/>{colunas}'
-            f'<rect x="6" y="52" width="58" height="10" fill="#E9A7B5" stroke="{c}" stroke-width="1.3"/>{janelas}'
-            f'<rect x="4" y="62" width="62" height="3" fill="#F6EBD3" stroke="{c}" stroke-width="1.1"/>')
-
-
-def icone_boto(c):
-    corpo = ("M14 50 C16 34 30 21 48 19.5 C54 19 58 21.5 60.5 24.5 L68 29 C68.6 30.6 67.6 31.8 65.6 31.6 "
-             "L58 30.6 C46 31 33 38 23 52 Z")
-    cauda = "M18.5 51 C12 53 8 57 5 63 C11 61.5 15 60.5 18 57.5 C20 61 24 63.5 30 64.5 C26 60 22.5 55 18.5 51 Z"
-    nadadeira = "M42 30 C40.5 36 38.5 40 35 43 C42 41.5 46 37 46.5 31 Z"
-    agua = onda(2, 66, 62, 3.4, periodos=3)[0]
-    return (f'<path d="{agua}" fill="#4FA3C7" stroke="{c}" stroke-width="1.2" stroke-linejoin="round"/>'
-            f'<path d="{cauda}" fill="#E9799A" stroke="{c}" stroke-width="1.3" stroke-linejoin="round"/>'
-            f'<path d="{corpo}" fill="#F28BA8" stroke="{c}" stroke-width="1.4" stroke-linejoin="round"/>'
-            f'<path d="M26 44 C34 35 44 31 56 30.8" fill="none" stroke="#FFD0DC" stroke-width="1.4" stroke-linecap="round"/>'
-            f'<path d="{nadadeira}" fill="#E9799A" stroke="{c}" stroke-width="1.2" stroke-linejoin="round"/>'
-            f'<circle cx="56.5" cy="25.2" r="1.3" fill="#1B1A17"/>'
-            f'<circle cx="62" cy="13" r="1.6" fill="#4FA3C7" stroke="{c}" stroke-width="0.8"/>'
-            f'<circle cx="66" cy="18" r="1.1" fill="#4FA3C7" stroke="{c}" stroke-width="0.8"/>')
-
-
-ICONES = {
-    "guarana": icone_guarana,
-    "vitoria-regia": icone_vitoria_regia,
-    "tucunare": icone_tucunare,
-    "encontro-das-aguas": icone_encontro,
-    "teatro-amazonas": icone_cupula,
-    "boto": icone_boto,
-}
+    for item in DADOS["listas"]:
+        for var in ("clara", "escura"):
+            salvar("costas", f'{item["id"]}-{var}', lista(item, var))
+    t = DADOS["turne"]
+    for var in ("clara", "escura"):
+        salvar("costas", f"turne-{var}", turne_costas(t, var))
+        salvar("frente", f"turne-{var}", turne_frente(t, var))
 
 
 def gerar_catalogo():
-    """Monta catalogo.html (vitrine com as camisas) a partir do modelo e do frases.json."""
+    """Monta catalogo.html a partir do modelo e do frases.json."""
     modelo = (RAIZ / "ferramentas" / "catalogo_modelo.html").read_text(encoding="utf-8")
     dados = json.dumps(DADOS, ensure_ascii=False)
-    pagina = modelo.replace("/*DADOS*/null", dados).replace("Catálogo Pavulagem", f"Catálogo {MARCA['nome'].title()}")
-    (RAIZ / "catalogo.html").write_text(pagina, encoding="utf-8")
+    (RAIZ / "catalogo.html").write_text(modelo.replace("/*DADOS*/null", dados), encoding="utf-8")
 
 
 if __name__ == "__main__":
+    if SAIDA.exists():
+        shutil.rmtree(SAIDA)
     gerar_frases()
     gerar_marca()
     gerar_catalogo()
