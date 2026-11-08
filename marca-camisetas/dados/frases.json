@@ -168,7 +168,7 @@
    "verbete": {
     "palavra": "pi·ti·ú",
     "classe": "s.m.",
-    "definicao": "Cheiro forte de peixe, de rio ou de gente que suou o dia todo.",
+    "definicao": "Catinga de qualquer tipo: peixe, rio, suor depois do sol.",
     "exemplo": "Voltou da feira da Panair e tá só o pitiú."
    }
   },
@@ -193,12 +193,11 @@
    "pre": "só o",
    "script": "Cuí!",
    "doodle": "migalhas",
-   "confirmar": true,
    "verbete": {
     "palavra": "cu·í",
     "classe": "s.m.",
-    "definicao": "Farinha fininha, o pó que sobra. \"Tá só o cuí\": acabado, em pedaços.",
-    "exemplo": "Depois do plantão de doze horas eu tô só o cuí."
+    "definicao": "Farinha bem fina, a que passa na peneira. \"Só o cuí\": magrinho, só pele e osso.",
+    "exemplo": "Voltou da viagem só o cuí, mana. Bora merendar!"
    }
   },
   {
@@ -236,11 +235,10 @@
    "pre": "nem com",
    "script": "Nojo",
    "doodle": "x",
-   "confirmar": true,
    "verbete": {
     "palavra": "nem com no·jo",
     "classe": "expr.",
-    "definicao": "De jeito nenhum, nem pensar.",
+    "definicao": "Zero vontade: isso eu não faço de jeito nenhum.",
     "exemplo": "Banho de igarapé gelado às seis da manhã? Nem com nojo."
    }
   },
@@ -321,16 +319,15 @@
   {
    "id": "capim-na-palheta",
    "frase": "Capim na palheta!",
-   "colecao": "elogio",
+   "colecao": "acao",
    "pre": "capim na",
    "script": "Palheta!",
-   "doodle": "faiscas",
-   "confirmar": true,
+   "doodle": "x",
    "verbete": {
     "palavra": "ca·pim na pa·lhe·ta",
     "classe": "expr.",
-    "definicao": "A toda velocidade, sem parar pra nada.",
-    "exemplo": "Quando o chefe chegou, foi capim na palheta!"
+    "definicao": "Quando o plano emperra e tudo dá errado. Vem do mato que enrosca na hélice do barco.",
+    "exemplo": "Fui vender açaí no domingo e choveu o dia inteiro: capim na palheta!"
    },
    "empilhar": true
   },
@@ -411,14 +408,13 @@
    "frase": "Ê caroço!",
    "colecao": "acao",
    "script": "Ê caroço!",
-   "nota": "encrenca das grandes",
+   "nota": "escapei por um triz!",
    "doodle": "rabisco",
-   "confirmar": true,
    "verbete": {
-    "palavra": "ca·ro·ço",
-    "classe": "s.m.",
-    "definicao": "Coisa difícil, encrenca, situação complicada.",
-    "exemplo": "Prova de cálculo amanhã? Ê caroço!"
+    "palavra": "ê ca·ro·ço",
+    "classe": "interj.",
+    "definicao": "Grito de susto, ou de alívio de quem escapou por um triz de uma enrascada.",
+    "exemplo": "O carro passou na poça e quase me molhou todinho. Ê caroço!"
    }
   },
   {

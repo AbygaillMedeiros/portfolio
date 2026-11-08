@@ -68,28 +68,44 @@ Pesquise o nome no INPI (busca gratuita em gov.br/inpi, classe 25, vestuário) e
 |---|---|
 | Saudação | Mano!, Mana!, Ixi!, Eita pau!, Olha já!, Espia só! |
 | Deboche | Telezé?, Olha o papo desse bicho!, Tá só o pitiú, Cheio de pavulagem!, Só o cuí!, Marrapaz! Se manca!, É muito fuleiro mesmo!, Nem com nojo |
-| Elogio | Maceta!, Maceta que só!, Tá lá, cheiroso!, No olho!, De cumborra!!, Capim na palheta! |
-| Ação e afeto | Borimbora, Pega o beco!, Toma tua merenda!, Não trisca, Lá na Caixa-prego, Ê caroço!, Moleque doido! |
+| Elogio | Maceta!, Maceta que só!, Tá lá, cheiroso!, No olho!, De cumborra!! |
+| Ação e afeto | Borimbora, Pega o beco!, Toma tua merenda!, Não trisca, Lá na Caixa-prego, Ê caroço!, Moleque doido!, Capim na palheta! |
 | Turnê | Turnê Lá na Caixa-prego |
 
 **Duplas para presente:** Mano! + Mana!, Olha já! + Espia só!, Toma tua merenda! + Moleque doido!
 
-### ⚠️ Confirme estes 8 verbetes antes de imprimir
+### Verbetes conferidos
 
-Os significados abaixo saíram do que eu conheço, e não tenho certeza deles:
+Conferidos em fontes sobre o falar amazonense (lista abaixo). Os textos dos verbetes foram escritos do zero, sem copiar as fontes.
 
-| Frase | O que está escrito |
+| Frase | O que mudou |
 |---|---|
-| Só o cuí! | Farinha fininha, o pó que sobra. "Tá só o cuí": acabado, em pedaços. |
-| Nem com nojo | De jeito nenhum, nem pensar. |
-| Tá lá, cheiroso! | Arrumado, perfumado, pronto pra sair. |
-| No olho! | Na medida certa, sem errar. (nota na frente: "na medida certa") |
-| De cumborra!! | Em quantidade, de monte, com fartura. |
-| Capim na palheta! | A toda velocidade, sem parar pra nada. |
-| Toma tua merenda! | Bem feito! Procurou e achou. |
-| Ê caroço! | Coisa difícil, encrenca. (nota na frente: "encrenca das grandes") |
+| Capim na palheta! | **Corrigido.** Quer dizer "deu errado" (vem do mato que trava a hélice do barco). Mudou para a coleção Ação e afeto. |
+| Só o cuí! | **Corrigido.** Quer dizer muito magro, só pele e osso. Cuí é a farinha fininha da peneira. |
+| Ê caroço! | **Corrigido.** Grito de susto, ou de alívio de quem escapou por pouco. |
+| Nem com nojo | **Confirmado.** Sem nenhuma vontade de fazer. |
+| Tá só o pitiú | Ajustado: vale para qualquer catinga, não só cheiro de peixe. |
 
-Corrija em `dados/frases.json` (campos `verbete` e `nota`) ou me mande o significado certo.
+### ⚠️ Ainda falta confirmar 4
+
+Nenhuma fonte encontrada explica estas. Se tu não conheces bem o sentido, o mais seguro é deixar fora da primeira coleção.
+
+| Frase | O que está escrito hoje |
+|---|---|
+| Tá lá, cheiroso! | Arrumado, perfumado, pronto pra sair. |
+| No olho! | Na medida certa, sem errar. |
+| De cumborra!! | Em quantidade, de monte, com fartura. |
+| Toma tua merenda! | Bem feito! Procurou e achou. (Em Manaus, merenda é qualquer refeição, não só o lanche.) |
+
+Fontes consultadas:
+- [Portal Amazônia: Amazonês, 30 gírias e expressões de Manaus](https://portalamazonia.com/variedades/amazones-aprenda-30-girias-e-expressoes-que-sao-a-cara-de-manaus-2/)
+- [Dicionário Informal: capim na palheta](https://www.dicionarioinformal.com.br/capim+na+palheta/)
+- [No Amazonas é Assim: O Amazonês](https://noamazonaseassim.com/o-amazones/)
+- [No Amazonas é Assim: expressões do Amazonas](https://noamazonaseassim.com/expressoes-que-so-quem-e-do-amazonas-domina-o-significado/)
+- [Amazonas1: dicionário amazonense](https://amazonas1.com.br/dicionario-amazonense-conheca-o-significado-de-20-expressoes-da-regiao/)
+- [Jornal do Commercio: Esse jeito único de falar](https://jcam.com.br/noticias/esse-jeito-unico-de-falar/)
+
+Referência mais completa: o livro *Amazonês: expressões e termos usados no Amazonas*, de Sérgio Freire (cerca de 1.100 verbetes).
 
 ## 3. Como mandar para a gráfica de DTF
 
