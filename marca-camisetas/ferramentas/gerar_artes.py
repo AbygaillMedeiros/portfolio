@@ -280,7 +280,7 @@ def arte_frase(fr, var, larg, alt_max, traco, com_nota=True, semente=0):
     empilhar = pre and ((sx1 - sx0) / H100 > 3.6 or fr.get("empilhar"))
     if empilhar:
         # máquina de escrever em cima, letra à mão embaixo
-        tam_pre100 = 0.36 * H100
+        tam_pre100 = 0.52 * H100
         _, (px0, py0, px1, py1) = F["maquina"].caminho(pre, tam_pre100)
         esc = min(larg / (sx1 - sx0), alt_max / (H100 * 1.55))
         tam = 100 * esc
@@ -290,7 +290,7 @@ def arte_frase(fr, var, larg, alt_max, traco, com_nota=True, semente=0):
         giro = -5
     elif pre:
         # estilo "produzido por": máquina de escrever em vermelho + letra à mão
-        tam_pre100 = 0.34 * (sy1 - sy0)
+        tam_pre100 = 0.5 * (sy1 - sy0)
         _, (px0, py0, px1, py1) = F["maquina"].caminho(pre, tam_pre100)
         vao100 = 0.06 * (sy1 - sy0)
         larg100 = (px1 - px0) + vao100 + (sx1 - sx0)
