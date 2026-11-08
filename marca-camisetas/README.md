@@ -149,7 +149,7 @@ Com pré-venda, só se produz o que foi pago.
 | Mockup com foto | **Mockey.ai**, **Freepik** (grátis com crédito ao autor), **Mockup World** | Troque a arte pelo PNG desta pasta. |
 | Foto com pessoas por IA | **Google Flow** ou **Whisk**, **Ideogram** | Créditos grátis por mês. A IA costuma errar letras: confira a frase com lupa antes de postar. |
 
-**Conectar ao Claude:** Canva e Figma têm conector oficial (claude.ai → Configurações → Conectores). Com eles ligados, dá para eu montar as peças direto na sua conta. O Google Flow não tem conector, então lá a geração é feita por você mesma, com o prompt abaixo.
+**Conectar ao Claude:** Canva e Figma têm conector oficial (claude.ai → Configurações → Conectores). Com eles ligados, dá para eu montar as peças direto na sua conta. O Google Flow não tem conector, então lá a geração é feita direto no site, com o prompt abaixo.
 
 **Prompt para o Flow (4 fotos numa imagem só, para gastar menos crédito).** Envie o PNG da arte como imagem de referência e cole:
 
